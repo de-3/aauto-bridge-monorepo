@@ -4,7 +4,7 @@ module.exports = {
     sourceType: 'module',
   },
 
-  extends: ['@metamask/eslint-config'],
+  // extends: ['@metamask/eslint-config'],
 
   overrides: [
     {
@@ -17,6 +17,11 @@ module.exports = {
       extends: ['@metamask/eslint-config-typescript'],
       rules: {
         '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+        'jsdoc/require-jsdoc': 'off',
+        'jsdoc/require-description': 'off',
+        'jsdoc/require-returns': 'off',
+        'jsdoc/require-param-description': 'off',
+        'import/no-unassigned-import': 'off',
       },
     },
 
@@ -41,4 +46,4 @@ module.exports = {
     '**/public',
     '**/.cache',
   ],
-};
+}
