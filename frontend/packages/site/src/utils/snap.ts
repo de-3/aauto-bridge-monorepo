@@ -1,5 +1,5 @@
-import { defaultSnapOrigin } from '@/config/snap';
-import { GetSnapsResponse, Snap } from '@/types/snap';
+import { defaultSnapOrigin } from '@/config/snap'
+import { GetSnapsResponse, Snap } from '@/types/snap'
 
 /**
  * Get the installed snaps in MetaMask.
@@ -7,10 +7,11 @@ import { GetSnapsResponse, Snap } from '@/types/snap';
  * @returns The snaps installed in MetaMask.
  */
 export const getSnaps = async (): Promise<GetSnapsResponse> => {
-  return (await window.ethereum.request({
+  const req = await window.ethereum.request({
     method: 'wallet_getSnaps',
-  })) as unknown as GetSnapsResponse;
-};
+  })
+  return req as unknown as GetSnapsResponse
+}
 
 /**
  * Connect a snap to MetaMask.
@@ -27,8 +28,8 @@ export const connectSnap = async (
     params: {
       [snapId]: params,
     },
-  });
-};
+  })
+}
 
 /**
  * Get the snap from MetaMask.
@@ -38,17 +39,17 @@ export const connectSnap = async (
  */
 export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   try {
-    const snaps = await getSnaps();
+    const snaps = await getSnaps()
 
     return Object.values(snaps).find(
       (snap) =>
         snap.id === defaultSnapOrigin && (!version || snap.version === version),
-    );
+    )
   } catch (e) {
-    console.log('Failed to obtain installed snap', e);
-    return undefined;
+    console.log('Failed to obtain installed snap', e)
+    return undefined
   }
-};
+}
 
 /**
  * Invoke the "hello" method from the example snap.
@@ -58,7 +59,7 @@ export const sendHello = async () => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: { snapId: defaultSnapOrigin, request: { method: 'hello' } },
-  });
-};
+  })
+}
 
-export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
+export const isLocalSnap = (snapId: string) => snapId.startsWith('local:')

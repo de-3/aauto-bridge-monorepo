@@ -24,7 +24,8 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
-    "test": "jest"
+    "test": "jest",
+    "format": "eslint --fix './**/*.{ts,tsx}' && prettier --write './**/*.{ts,tsx,yaml,json}'"
   },
   "dependencies": {
     "@metamask/snaps-types": "^0.32.2",

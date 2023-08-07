@@ -2,13 +2,13 @@
 
 /// <reference types="react-scripts" />
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import { MetaMaskInpageProvider } from '@metamask/providers'
 /*
  * Window type extension to support ethereum
  */
 
 declare global {
   interface Window {
-    ethereum: MetaMaskInpageProvider;
+    ethereum: MetaMaskInpageProvider
   }
 }
