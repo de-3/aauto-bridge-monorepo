@@ -83,6 +83,8 @@ contract AccountManager is BaseAccount, Initializable {
         addDepositToEntryPoint();
     }
 
+    function _validateCondition() internal {}
+
     function addDepositToEntryPoint() public payable {
         _entryPoint.depositTo{value: msg.value}(address(this));
     }

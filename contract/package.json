@@ -1,4 +1,11 @@
 {
+  "name": "aauto-bridge-contract",
+  "description": "",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "clean": "rm -rf ./artifacts ./cache"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
