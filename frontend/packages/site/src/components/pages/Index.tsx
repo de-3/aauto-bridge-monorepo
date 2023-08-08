@@ -7,10 +7,13 @@ import {
   ConnectButton,
   ReconnectButton,
   SendHelloButton,
+  StoreSettingsButton,
 } from '../Button'
 import { shouldDisplayReconnectButton } from '@/utils/button'
 import { MetamaskState } from '@/types/metamask'
-import { connectSnap, getSnap, sendHello } from '@/utils/snap'
+import { connectSnap, getSnap, storeSettings } from '@/utils/snap'
+import { useSendTransaction } from 'wagmi'
+import { parseEther } from 'viem'
 
 export const IndexPage: FC<{}> = () => {
   const [metamaskState, setMetamaskState] = useState<MetamaskState>({
@@ -34,9 +37,33 @@ export const IndexPage: FC<{}> = () => {
     }
   }
 
+  const { sendTransaction } = useSendTransaction({
+    to: '0x5305f701cc749Acf1146E6DE47E10D094C20dbe9',
+    value: BigInt(0),
+  })
+
   const handleSendHelloClick = async () => {
     try {
-      await sendHello()
+      await sendTransaction()
+
+      //   await sendHello()
+    } catch (e) {
+      console.error(e)
+      setMetamaskState({
+        ...metamaskState,
+        error: e as Error,
+      })
+    }
+  }
+
+  const handleStoreSettings = async () => {
+    try {
+      await storeSettings(
+        420,
+        parseEther('1'),
+        parseEther('0.5'),
+        process.env.NEXT_PUBLIC_PRIVATE_KEY ?? '',
+      )
     } catch (e) {
       console.error(e)
       setMetamaskState({
@@ -106,6 +133,18 @@ export const IndexPage: FC<{}> = () => {
             </Text>
             <SendHelloButton
               onClick={handleSendHelloClick}
+              disabled={!metamaskState.installedSnap}
+            />
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody>
+            <Text>
+              Display a custom message within a confirmation screen in MetaMask.
+            </Text>
+            <StoreSettingsButton
+              onClick={handleStoreSettings}
               disabled={!metamaskState.installedSnap}
             />
           </CardBody>

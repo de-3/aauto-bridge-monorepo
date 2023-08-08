@@ -5,14 +5,52 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '../app/style'
 
 import { useEffect, useState } from 'react'
+import { WagmiConfig, configureChains, createConfig } from 'wagmi'
+import { polygonMumbai, optimismGoerli } from 'wagmi/chains'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { publicProvider } from 'wagmi/providers/public'
+import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
+import {
+  RainbowKitProvider,
+  connectorsForWallets,
+} from '@rainbow-me/rainbowkit'
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const { chains, publicClient } = configureChains(
+    [polygonMumbai, optimismGoerli],
+    [
+      alchemyProvider({
+        apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ?? '',
+      }),
+      publicProvider(),
+    ],
+  )
+
+  const projectId = 'Autonomous World ID'
+
+  const connectors = connectorsForWallets([
+    {
+      groupName: 'Recommended',
+      wallets: [metaMaskWallet({ projectId, chains })],
+    },
+  ])
+
+  const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors,
+    publicClient,
+  })
+
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
   return (
-    <CacheProvider>
-      <ChakraProvider theme={theme}>{mounted && children}</ChakraProvider>
-    </CacheProvider>
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider chains={chains}>
+        <CacheProvider>
+          <ChakraProvider theme={theme}>{mounted && children}</ChakraProvider>
+        </CacheProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   )
 }

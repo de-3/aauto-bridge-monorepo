@@ -34,6 +34,10 @@ export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Send message</Button>
 }
 
+export const StoreSettingsButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Store settings</Button>
+}
+
 export const HeaderButtons = ({
   state,
   onConnectClick,
