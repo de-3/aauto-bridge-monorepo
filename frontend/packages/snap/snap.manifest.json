@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
   "description": "An example Snap written in TypeScript.",
-  "proposedName": "AAuto Bridge Snap",
+  "proposedName": "AAuto Bridge",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "Sl6umoDHUAJA+g3eegXpL1igvy9Bkjepz2z+gi0Irno=",
+    "shasum": "W12NeqQQ2jIF2Nfsa4WtZS1hMM3pBqz0qwq8ECAICH8=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -19,9 +19,15 @@
   },
   "initialPermissions": {
     "snap_dialog": {},
+    "snap_manageState": {},
+    "endowment:network-access": {},
+    "endowment:ethereum-provider": {},
     "endowment:rpc": {
       "dapps": true,
-      "snaps": false
+      "snaps": true
+    },
+    "endowment:transaction-insight": {
+      "allowTransactionOrigin": true
     }
   },
   "manifestVersion": "0.1"
