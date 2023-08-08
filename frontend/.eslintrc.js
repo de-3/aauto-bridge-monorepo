@@ -22,6 +22,8 @@ module.exports = {
         'jsdoc/require-returns': 'off',
         'jsdoc/require-param-description': 'off',
         'import/no-unassigned-import': 'off',
+        '@typescript-eslint/ban-types': 'off',
+        '@typescript-eslint/no-shadow': 'off',
       },
     },
 
