@@ -50,7 +50,7 @@ contract AccountManager is BaseAccount, Initializable {
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
         bytes32 opHash = userOpHash.toEthSignedMessageHash();
-        if (userOpAddresses[msg.sender] != opHash.recover(userOp.signature))
+        if (userOpAddresses[userOp.sender] != opHash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
     }
