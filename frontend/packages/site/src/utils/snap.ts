@@ -55,6 +55,7 @@ export const storeSettings = async (
   chainId: number,
   maxAmount: BigInt,
   minAmount: BigInt,
+  baseChainId: number,
   privateKey: string,
 ) => {
   await window.ethereum.request({
@@ -71,6 +72,7 @@ export const storeSettings = async (
               minAmount: minAmount.toString(),
             },
           ],
+          baseChainId,
           privateKey,
         },
       },

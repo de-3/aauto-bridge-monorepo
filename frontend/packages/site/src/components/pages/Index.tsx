@@ -62,6 +62,7 @@ export const IndexPage: FC<{}> = () => {
         420,
         parseEther('1'),
         parseEther('0.5'),
+        1,
         process.env.NEXT_PUBLIC_PRIVATE_KEY ?? '',
       )
     } catch (e) {
@@ -131,8 +132,8 @@ export const IndexPage: FC<{}> = () => {
             <Text>
               Display a custom message within a confirmation screen in MetaMask.
             </Text>
-            <SendHelloButton
-              onClick={handleSendHelloClick}
+            <StoreSettingsButton
+              onClick={handleStoreSettings}
               disabled={!metamaskState.installedSnap}
             />
           </CardBody>
@@ -143,8 +144,8 @@ export const IndexPage: FC<{}> = () => {
             <Text>
               Display a custom message within a confirmation screen in MetaMask.
             </Text>
-            <StoreSettingsButton
-              onClick={handleStoreSettings}
+            <SendHelloButton
+              onClick={handleSendHelloClick}
               disabled={!metamaskState.installedSnap}
             />
           </CardBody>
