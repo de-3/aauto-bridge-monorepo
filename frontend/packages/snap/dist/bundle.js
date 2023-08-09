@@ -36542,7 +36542,7 @@
       };
       module.exports = LRUCache;
     }, {
-      "yallist": 247
+      "yallist": 278
     }],
     195: [function (require, module, exports) {
       module.exports = assert;
@@ -39924,6 +39924,3829 @@
       "timers": 245
     }],
     246: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.UserOperationBuilder = exports.DEFAULT_USER_OP = exports.DEFAULT_PRE_VERIFICATION_GAS = exports.DEFAULT_CALL_GAS_LIMIT = exports.DEFAULT_VERIFICATION_GAS_LIMIT = void 0;
+      const ethers_1 = require("ethers");
+      const utils_1 = require("./utils");
+      const context_1 = require("./context");
+      exports.DEFAULT_VERIFICATION_GAS_LIMIT = ethers_1.ethers.BigNumber.from(70000);
+      exports.DEFAULT_CALL_GAS_LIMIT = ethers_1.ethers.BigNumber.from(35000);
+      exports.DEFAULT_PRE_VERIFICATION_GAS = ethers_1.ethers.BigNumber.from(21000);
+      exports.DEFAULT_USER_OP = {
+        sender: ethers_1.ethers.constants.AddressZero,
+        nonce: ethers_1.ethers.constants.Zero,
+        initCode: ethers_1.ethers.utils.hexlify("0x"),
+        callData: ethers_1.ethers.utils.hexlify("0x"),
+        callGasLimit: exports.DEFAULT_CALL_GAS_LIMIT,
+        verificationGasLimit: exports.DEFAULT_VERIFICATION_GAS_LIMIT,
+        preVerificationGas: exports.DEFAULT_PRE_VERIFICATION_GAS,
+        maxFeePerGas: ethers_1.ethers.constants.Zero,
+        maxPriorityFeePerGas: ethers_1.ethers.constants.Zero,
+        paymasterAndData: ethers_1.ethers.utils.hexlify("0x"),
+        signature: ethers_1.ethers.utils.hexlify("0x")
+      };
+      class UserOperationBuilder {
+        constructor() {
+          this.defaultOp = Object.assign({}, exports.DEFAULT_USER_OP);
+          this.currOp = Object.assign({}, this.defaultOp);
+          this.middlewareStack = [];
+        }
+        resolveFields(op) {
+          const obj = {
+            sender: op.sender !== undefined ? ethers_1.ethers.utils.getAddress(op.sender) : undefined,
+            nonce: op.nonce !== undefined ? ethers_1.ethers.BigNumber.from(op.nonce) : undefined,
+            initCode: op.initCode !== undefined ? ethers_1.ethers.utils.hexlify(op.initCode) : undefined,
+            callData: op.callData !== undefined ? ethers_1.ethers.utils.hexlify(op.callData) : undefined,
+            callGasLimit: op.callGasLimit !== undefined ? ethers_1.ethers.BigNumber.from(op.callGasLimit) : undefined,
+            verificationGasLimit: op.verificationGasLimit !== undefined ? ethers_1.ethers.BigNumber.from(op.verificationGasLimit) : undefined,
+            preVerificationGas: op.preVerificationGas !== undefined ? ethers_1.ethers.BigNumber.from(op.preVerificationGas) : undefined,
+            maxFeePerGas: op.maxFeePerGas !== undefined ? ethers_1.ethers.BigNumber.from(op.maxFeePerGas) : undefined,
+            maxPriorityFeePerGas: op.maxPriorityFeePerGas !== undefined ? ethers_1.ethers.BigNumber.from(op.maxPriorityFeePerGas) : undefined,
+            paymasterAndData: op.paymasterAndData !== undefined ? ethers_1.ethers.utils.hexlify(op.paymasterAndData) : undefined,
+            signature: op.signature !== undefined ? ethers_1.ethers.utils.hexlify(op.signature) : undefined
+          };
+          return Object.keys(obj).reduce((prev, curr) => obj[curr] !== undefined ? Object.assign(Object.assign({}, prev), {
+            [curr]: obj[curr]
+          }) : prev, {});
+        }
+        getSender() {
+          return this.currOp.sender;
+        }
+        getNonce() {
+          return this.currOp.nonce;
+        }
+        getInitCode() {
+          return this.currOp.initCode;
+        }
+        getCallData() {
+          return this.currOp.callData;
+        }
+        getCallGasLimit() {
+          return this.currOp.callGasLimit;
+        }
+        getVerificationGasLimit() {
+          return this.currOp.verificationGasLimit;
+        }
+        getPreVerificationGas() {
+          return this.currOp.preVerificationGas;
+        }
+        getMaxFeePerGas() {
+          return this.currOp.maxFeePerGas;
+        }
+        getMaxPriorityFeePerGas() {
+          return this.currOp.maxPriorityFeePerGas;
+        }
+        getPaymasterAndData() {
+          return this.currOp.paymasterAndData;
+        }
+        getSignature() {
+          return this.currOp.signature;
+        }
+        getOp() {
+          return this.currOp;
+        }
+        setSender(val) {
+          this.currOp.sender = ethers_1.ethers.utils.getAddress(val);
+          return this;
+        }
+        setNonce(val) {
+          this.currOp.nonce = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setInitCode(val) {
+          this.currOp.initCode = ethers_1.ethers.utils.hexlify(val);
+          return this;
+        }
+        setCallData(val) {
+          this.currOp.callData = ethers_1.ethers.utils.hexlify(val);
+          return this;
+        }
+        setCallGasLimit(val) {
+          this.currOp.callGasLimit = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setVerificationGasLimit(val) {
+          this.currOp.verificationGasLimit = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setPreVerificationGas(val) {
+          this.currOp.preVerificationGas = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setMaxFeePerGas(val) {
+          this.currOp.maxFeePerGas = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setMaxPriorityFeePerGas(val) {
+          this.currOp.maxPriorityFeePerGas = ethers_1.ethers.BigNumber.from(val);
+          return this;
+        }
+        setPaymasterAndData(val) {
+          this.currOp.paymasterAndData = ethers_1.ethers.utils.hexlify(val);
+          return this;
+        }
+        setSignature(val) {
+          this.currOp.signature = ethers_1.ethers.utils.hexlify(val);
+          return this;
+        }
+        setPartial(partialOp) {
+          this.currOp = Object.assign(Object.assign({}, this.currOp), this.resolveFields(partialOp));
+          return this;
+        }
+        useDefaults(partialOp) {
+          const resolvedOp = this.resolveFields(partialOp);
+          this.defaultOp = Object.assign(Object.assign({}, this.defaultOp), resolvedOp);
+          this.currOp = Object.assign(Object.assign({}, this.currOp), resolvedOp);
+          return this;
+        }
+        resetDefaults() {
+          this.defaultOp = Object.assign({}, exports.DEFAULT_USER_OP);
+          return this;
+        }
+        useMiddleware(fn) {
+          this.middlewareStack = [...this.middlewareStack, fn];
+          return this;
+        }
+        resetMiddleware() {
+          this.middlewareStack = [];
+          return this;
+        }
+        buildOp(entryPoint, chainId) {
+          return __awaiter(this, void 0, void 0, function* () {
+            const ctx = new context_1.UserOperationMiddlewareCtx(this.currOp, entryPoint, chainId);
+            for (const fn of this.middlewareStack) {
+              yield fn(ctx);
+            }
+            this.setPartial(ctx.op);
+            return (0, utils_1.OpToJSON)(this.currOp);
+          });
+        }
+        resetOp() {
+          this.currOp = Object.assign({}, this.defaultOp);
+          return this;
+        }
+      }
+      exports.UserOperationBuilder = UserOperationBuilder;
+    }, {
+      "./context": 252,
+      "./utils": 275,
+      "ethers": 176
+    }],
+    247: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Client = void 0;
+      const ethers_1 = require("ethers");
+      const typechain_1 = require("./typechain");
+      const utils_1 = require("./utils");
+      const context_1 = require("./context");
+      const constants_1 = require("./constants");
+      const provider_1 = require("./provider");
+      class Client {
+        constructor(rpcUrl, opts) {
+          this.provider = new provider_1.BundlerJsonRpcProvider(rpcUrl).setBundlerRpc(opts === null || opts === void 0 ? void 0 : opts.overrideBundlerRpc);
+          this.entryPoint = typechain_1.EntryPoint__factory.connect((opts === null || opts === void 0 ? void 0 : opts.entryPoint) || constants_1.ERC4337.EntryPoint, this.provider);
+          this.chainId = ethers_1.ethers.BigNumber.from(1);
+          this.waitTimeoutMs = 30000;
+          this.waitIntervalMs = 5000;
+        }
+        static init(rpcUrl, opts) {
+          return __awaiter(this, void 0, void 0, function* () {
+            const instance = new Client(rpcUrl, opts);
+            instance.chainId = yield instance.provider.getNetwork().then(network => ethers_1.ethers.BigNumber.from(network.chainId));
+            return instance;
+          });
+        }
+        buildUserOperation(builder) {
+          return __awaiter(this, void 0, void 0, function* () {
+            return builder.buildOp(this.entryPoint.address, this.chainId);
+          });
+        }
+        sendUserOperation(builder, opts) {
+          var _a;
+          return __awaiter(this, void 0, void 0, function* () {
+            const dryRun = Boolean(opts === null || opts === void 0 ? void 0 : opts.dryRun);
+            const op = yield this.buildUserOperation(builder);
+            (_a = opts === null || opts === void 0 ? void 0 : opts.onBuild) === null || _a === void 0 ? void 0 : _a.call(opts, op);
+            const userOpHash = dryRun ? new context_1.UserOperationMiddlewareCtx(op, this.entryPoint.address, this.chainId).getUserOpHash() : yield this.provider.send("eth_sendUserOperation", [(0, utils_1.OpToJSON)(op), this.entryPoint.address]);
+            builder.resetOp();
+            return {
+              userOpHash,
+              wait: () => __awaiter(this, void 0, void 0, function* () {
+                if (dryRun) {
+                  return null;
+                }
+                const end = Date.now() + this.waitTimeoutMs;
+                const block = yield this.provider.getBlock("latest");
+                while (Date.now() < end) {
+                  const events = yield this.entryPoint.queryFilter(this.entryPoint.filters.UserOperationEvent(userOpHash), Math.max(0, block.number - 100));
+                  if (events.length > 0) {
+                    return events[0];
+                  }
+                  yield new Promise(resolve => setTimeout(resolve, this.waitIntervalMs));
+                }
+                return null;
+              })
+            };
+          });
+        }
+      }
+      exports.Client = Client;
+    }, {
+      "./constants": 249,
+      "./context": 252,
+      "./provider": 263,
+      "./typechain": 273,
+      "./utils": 275,
+      "ethers": 176
+    }],
+    248: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.ERC4337 = void 0;
+      exports.ERC4337 = {
+        EntryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+        SimpleAccount: {
+          Factory: "0x9406Cc6185a346906296840746125a0E44976454"
+        }
+      };
+    }, {}],
+    249: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __exportStar = this && this.__exportStar || function (m, exports) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      __exportStar(require("./erc4337"), exports);
+      __exportStar(require("./kernel"), exports);
+      __exportStar(require("./safe"), exports);
+    }, {
+      "./erc4337": 248,
+      "./kernel": 250,
+      "./safe": 251
+    }],
+    250: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Kernel = void 0;
+      exports.Kernel = {
+        Factory: "0x5D006d3880645ec6e254E18C1F879DAC9Dd71A39",
+        ECDSAFactory: "0xD49a72cb78C44c6bfbf0d471581B7635cF62E81e",
+        ECDSAValidator: "0x180D6465F921C7E0DEA0040107D342c87455fFF5",
+        Modes: {
+          Sudo: "0x00000000",
+          Plugin: "0x00000001",
+          Enable: "0x00000002"
+        }
+      };
+    }, {}],
+    251: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Safe = void 0;
+      exports.Safe = {
+        MultiSend: {
+          "1": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "3": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "4": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "5": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "10": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "11": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "12": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "18": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "25": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "28": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "39": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "40": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "41": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "42": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "50": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "51": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "56": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "61": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "63": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "69": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "82": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "83": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "97": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "100": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "106": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "108": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "111": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "122": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "123": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "137": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "246": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "250": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "288": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "300": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "321": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "322": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "336": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "338": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "420": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "588": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "592": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "595": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "599": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "686": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "787": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1001": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1008": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1088": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1101": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1111": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1112": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1115": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1116": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1284": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1285": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1287": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1294": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1807": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1984": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2001": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2002": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2008": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2019": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2020": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2221": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "2222": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "3737": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "4002": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "4689": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "4918": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "4919": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "5001": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "7341": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "7700": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "8217": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "9000": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "9001": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "9728": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "10000": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "10001": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "10200": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "11235": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "11437": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "12357": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "23294": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "42161": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "42170": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "42220": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "43113": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "43114": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "43288": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "44787": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "45000": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "47805": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "54211": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "56288": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "59140": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "71401": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "71402": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "73799": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "80001": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "84531": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "200101": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "200202": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "333999": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "421611": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "421613": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "534353": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "11155111": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "245022926": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1313161554": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1313161555": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "1666600000": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "1666700000": "0x998739BFdAAdde7C933B942a68053933098f9EDa",
+          "11297108099": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+          "11297108109": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761"
+        }
+      };
+    }, {}],
+    252: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.UserOperationMiddlewareCtx = void 0;
+      const ethers_1 = require("ethers");
+      class UserOperationMiddlewareCtx {
+        constructor(op, entryPoint, chainId) {
+          this.op = Object.assign({}, op);
+          this.entryPoint = ethers_1.ethers.utils.getAddress(entryPoint);
+          this.chainId = ethers_1.ethers.BigNumber.from(chainId);
+        }
+        getUserOpHash() {
+          const packed = ethers_1.ethers.utils.defaultAbiCoder.encode(["address", "uint256", "bytes32", "bytes32", "uint256", "uint256", "uint256", "uint256", "uint256", "bytes32"], [this.op.sender, this.op.nonce, ethers_1.ethers.utils.keccak256(this.op.initCode), ethers_1.ethers.utils.keccak256(this.op.callData), this.op.callGasLimit, this.op.verificationGasLimit, this.op.preVerificationGas, this.op.maxFeePerGas, this.op.maxPriorityFeePerGas, ethers_1.ethers.utils.keccak256(this.op.paymasterAndData)]);
+          const enc = ethers_1.ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "uint256"], [ethers_1.ethers.utils.keccak256(packed), this.entryPoint, this.chainId]);
+          return ethers_1.ethers.utils.keccak256(enc);
+        }
+      }
+      exports.UserOperationMiddlewareCtx = UserOperationMiddlewareCtx;
+    }, {
+      "ethers": 176
+    }],
+    253: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+        Object.defineProperty(o, "default", {
+          enumerable: true,
+          value: v
+        });
+      } : function (o, v) {
+        o["default"] = v;
+      });
+      var __importStar = this && this.__importStar || function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+        __setModuleDefault(result, mod);
+        return result;
+      };
+      var __exportStar = this && this.__exportStar || function (m, exports) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Utils = exports.Presets = exports.Constants = void 0;
+      exports.Constants = __importStar(require("./constants"));
+      exports.Presets = __importStar(require("./preset"));
+      exports.Utils = __importStar(require("./utils"));
+      __exportStar(require("./builder"), exports);
+      __exportStar(require("./client"), exports);
+      __exportStar(require("./context"), exports);
+      __exportStar(require("./provider"), exports);
+      __exportStar(require("./types"), exports);
+    }, {
+      "./builder": 246,
+      "./client": 247,
+      "./constants": 249,
+      "./context": 252,
+      "./preset": 257,
+      "./provider": 263,
+      "./types": 274,
+      "./utils": 275
+    }],
+    254: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __exportStar = this && this.__exportStar || function (m, exports) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      __exportStar(require("./kernel"), exports);
+      __exportStar(require("./simpleAccount"), exports);
+    }, {
+      "./kernel": 255,
+      "./simpleAccount": 256
+    }],
+    255: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Kernel = void 0;
+      const ethers_1 = require("ethers");
+      const constants_1 = require("../../constants");
+      const builder_1 = require("../../builder");
+      const provider_1 = require("../../provider");
+      const middleware_1 = require("../middleware");
+      const typechain_1 = require("../../typechain");
+      const safe_1 = require("../../constants/safe");
+      var Operation;
+      (function (Operation) {
+        Operation[Operation["Call"] = 0] = "Call";
+        Operation[Operation["DelegateCall"] = 1] = "DelegateCall";
+      })(Operation || (Operation = {}));
+      class Kernel extends builder_1.UserOperationBuilder {
+        constructor(signer, rpcUrl, opts) {
+          super();
+          this.resolveAccount = ctx => __awaiter(this, void 0, void 0, function* () {
+            ctx.op.nonce = yield this.entryPoint.getNonce(ctx.op.sender, 0);
+            ctx.op.initCode = ctx.op.nonce.eq(0) ? this.initCode : "0x";
+          });
+          this.sudoMode = ctx => __awaiter(this, void 0, void 0, function* () {
+            ctx.op.signature = ethers_1.ethers.utils.hexConcat([constants_1.Kernel.Modes.Sudo, ctx.op.signature]);
+          });
+          this.signer = signer;
+          this.provider = new provider_1.BundlerJsonRpcProvider(rpcUrl).setBundlerRpc(opts === null || opts === void 0 ? void 0 : opts.overrideBundlerRpc);
+          this.entryPoint = typechain_1.EntryPoint__factory.connect((opts === null || opts === void 0 ? void 0 : opts.entryPoint) || constants_1.ERC4337.EntryPoint, this.provider);
+          this.factory = typechain_1.ECDSAKernelFactory__factory.connect((opts === null || opts === void 0 ? void 0 : opts.factory) || constants_1.Kernel.ECDSAFactory, this.provider);
+          this.initCode = "0x";
+          this.multisend = typechain_1.Multisend__factory.connect(ethers_1.ethers.constants.AddressZero, this.provider);
+          this.proxy = typechain_1.Kernel__factory.connect(ethers_1.ethers.constants.AddressZero, this.provider);
+        }
+        static init(signer, rpcUrl, opts) {
+          var _a, _b;
+          return __awaiter(this, void 0, void 0, function* () {
+            const instance = new Kernel(signer, rpcUrl, opts);
+            try {
+              instance.initCode = yield ethers_1.ethers.utils.hexConcat([instance.factory.address, instance.factory.interface.encodeFunctionData("createAccount", [yield instance.signer.getAddress(), ethers_1.ethers.BigNumber.from((_a = opts === null || opts === void 0 ? void 0 : opts.salt) !== null && _a !== void 0 ? _a : 0)])]);
+              yield instance.entryPoint.callStatic.getSenderAddress(instance.initCode);
+              throw new Error("getSenderAddress: unexpected result");
+            } catch (error) {
+              const addr = (_b = error === null || error === void 0 ? void 0 : error.errorArgs) === null || _b === void 0 ? void 0 : _b.sender;
+              if (!addr) throw error;
+              const chain = yield instance.provider.getNetwork().then(n => n.chainId);
+              const ms = safe_1.Safe.MultiSend[chain.toString()];
+              if (!ms) throw new Error(`Multisend contract not deployed on network: ${chain.toString()}`);
+              instance.multisend = typechain_1.Multisend__factory.connect(ms, instance.provider);
+              instance.proxy = typechain_1.Kernel__factory.connect(addr, instance.provider);
+            }
+            const base = instance.useDefaults({
+              sender: instance.proxy.address,
+              signature: ethers_1.ethers.utils.hexConcat([constants_1.Kernel.Modes.Sudo, yield instance.signer.signMessage(ethers_1.ethers.utils.arrayify(ethers_1.ethers.utils.keccak256("0xdead")))])
+            }).useMiddleware(instance.resolveAccount).useMiddleware((0, middleware_1.getGasPrice)(instance.provider));
+            const withPM = (opts === null || opts === void 0 ? void 0 : opts.paymasterMiddleware) ? base.useMiddleware(opts.paymasterMiddleware) : base.useMiddleware((0, middleware_1.estimateUserOperationGas)(instance.provider));
+            return withPM.useMiddleware((0, middleware_1.EOASignature)(instance.signer)).useMiddleware(instance.sudoMode);
+          });
+        }
+        execute(call) {
+          return this.setCallData(this.proxy.interface.encodeFunctionData("execute", [call.to, call.value, call.data, Operation.Call]));
+        }
+        executeBatch(calls) {
+          const data = this.multisend.interface.encodeFunctionData("multiSend", [ethers_1.ethers.utils.hexConcat(calls.map(c => ethers_1.ethers.utils.solidityPack(["uint8", "address", "uint256", "uint256", "bytes"], [Operation.Call, c.to, c.value, ethers_1.ethers.utils.hexDataLength(c.data), c.data])))]);
+          return this.setCallData(this.proxy.interface.encodeFunctionData("execute", [this.multisend.address, ethers_1.ethers.constants.Zero, data, Operation.DelegateCall]));
+        }
+      }
+      exports.Kernel = Kernel;
+    }, {
+      "../../builder": 246,
+      "../../constants": 249,
+      "../../constants/safe": 251,
+      "../../provider": 263,
+      "../../typechain": 273,
+      "../middleware": 260,
+      "ethers": 176
+    }],
+    256: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.SimpleAccount = void 0;
+      const ethers_1 = require("ethers");
+      const constants_1 = require("../../constants");
+      const builder_1 = require("../../builder");
+      const provider_1 = require("../../provider");
+      const middleware_1 = require("../middleware");
+      const typechain_1 = require("../../typechain");
+      class SimpleAccount extends builder_1.UserOperationBuilder {
+        constructor(signer, rpcUrl, opts) {
+          super();
+          this.resolveAccount = ctx => __awaiter(this, void 0, void 0, function* () {
+            ctx.op.nonce = yield this.entryPoint.getNonce(ctx.op.sender, 0);
+            ctx.op.initCode = ctx.op.nonce.eq(0) ? this.initCode : "0x";
+          });
+          this.signer = signer;
+          this.provider = new provider_1.BundlerJsonRpcProvider(rpcUrl).setBundlerRpc(opts === null || opts === void 0 ? void 0 : opts.overrideBundlerRpc);
+          this.entryPoint = typechain_1.EntryPoint__factory.connect((opts === null || opts === void 0 ? void 0 : opts.entryPoint) || constants_1.ERC4337.EntryPoint, this.provider);
+          this.factory = typechain_1.SimpleAccountFactory__factory.connect((opts === null || opts === void 0 ? void 0 : opts.factory) || constants_1.ERC4337.SimpleAccount.Factory, this.provider);
+          this.initCode = "0x";
+          this.proxy = typechain_1.SimpleAccount__factory.connect(ethers_1.ethers.constants.AddressZero, this.provider);
+        }
+        static init(signer, rpcUrl, opts) {
+          var _a, _b;
+          return __awaiter(this, void 0, void 0, function* () {
+            const instance = new SimpleAccount(signer, rpcUrl, opts);
+            try {
+              instance.initCode = yield ethers_1.ethers.utils.hexConcat([instance.factory.address, instance.factory.interface.encodeFunctionData("createAccount", [yield instance.signer.getAddress(), ethers_1.ethers.BigNumber.from((_a = opts === null || opts === void 0 ? void 0 : opts.salt) !== null && _a !== void 0 ? _a : 0)])]);
+              yield instance.entryPoint.callStatic.getSenderAddress(instance.initCode);
+              throw new Error("getSenderAddress: unexpected result");
+            } catch (error) {
+              const addr = (_b = error === null || error === void 0 ? void 0 : error.errorArgs) === null || _b === void 0 ? void 0 : _b.sender;
+              if (!addr) throw error;
+              instance.proxy = typechain_1.SimpleAccount__factory.connect(addr, instance.provider);
+            }
+            const base = instance.useDefaults({
+              sender: instance.proxy.address,
+              signature: yield instance.signer.signMessage(ethers_1.ethers.utils.arrayify(ethers_1.ethers.utils.keccak256("0xdead")))
+            }).useMiddleware(instance.resolveAccount).useMiddleware((0, middleware_1.getGasPrice)(instance.provider));
+            const withPM = (opts === null || opts === void 0 ? void 0 : opts.paymasterMiddleware) ? base.useMiddleware(opts.paymasterMiddleware) : base.useMiddleware((0, middleware_1.estimateUserOperationGas)(instance.provider));
+            return withPM.useMiddleware((0, middleware_1.EOASignature)(instance.signer));
+          });
+        }
+        execute(to, value, data) {
+          return this.setCallData(this.proxy.interface.encodeFunctionData("execute", [to, value, data]));
+        }
+        executeBatch(to, data) {
+          return this.setCallData(this.proxy.interface.encodeFunctionData("executeBatch", [to, data]));
+        }
+      }
+      exports.SimpleAccount = SimpleAccount;
+    }, {
+      "../../builder": 246,
+      "../../constants": 249,
+      "../../provider": 263,
+      "../../typechain": 273,
+      "../middleware": 260,
+      "ethers": 176
+    }],
+    257: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+        Object.defineProperty(o, "default", {
+          enumerable: true,
+          value: v
+        });
+      } : function (o, v) {
+        o["default"] = v;
+      });
+      var __importStar = this && this.__importStar || function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+        __setModuleDefault(result, mod);
+        return result;
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Middleware = exports.Builder = void 0;
+      exports.Builder = __importStar(require("./builder"));
+      exports.Middleware = __importStar(require("./middleware"));
+    }, {
+      "./builder": 254,
+      "./middleware": 260
+    }],
+    258: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.estimateUserOperationGas = void 0;
+      const ethers_1 = require("ethers");
+      const utils_1 = require("../../utils");
+      const estimateCreationGas = (provider, initCode) => __awaiter(void 0, void 0, void 0, function* () {
+        const initCodeHex = ethers_1.ethers.utils.hexlify(initCode);
+        const factory = initCodeHex.substring(0, 42);
+        const callData = "0x" + initCodeHex.substring(42);
+        return yield provider.estimateGas({
+          to: factory,
+          data: callData
+        });
+      });
+      const estimateUserOperationGas = provider => ctx => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        if (ethers_1.ethers.BigNumber.from(ctx.op.nonce).isZero()) {
+          ctx.op.verificationGasLimit = ethers_1.ethers.BigNumber.from(ctx.op.verificationGasLimit).add(yield estimateCreationGas(provider, ctx.op.initCode));
+        }
+        const est = yield provider.send("eth_estimateUserOperationGas", [(0, utils_1.OpToJSON)(ctx.op), ctx.entryPoint]);
+        ctx.op.preVerificationGas = est.preVerificationGas;
+        ctx.op.verificationGasLimit = (_a = est.verificationGasLimit) !== null && _a !== void 0 ? _a : est.verificationGas;
+        ctx.op.callGasLimit = est.callGasLimit;
+      });
+      exports.estimateUserOperationGas = estimateUserOperationGas;
+    }, {
+      "../../utils": 275,
+      "ethers": 176
+    }],
+    259: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.getGasPrice = void 0;
+      const ethers_1 = require("ethers");
+      const eip1559GasPrice = provider => __awaiter(void 0, void 0, void 0, function* () {
+        const [fee, block] = yield Promise.all([provider.send("eth_maxPriorityFeePerGas", []), provider.getBlock("latest")]);
+        const tip = ethers_1.ethers.BigNumber.from(fee);
+        const buffer = tip.div(100).mul(13);
+        const maxPriorityFeePerGas = tip.add(buffer);
+        const maxFeePerGas = block.baseFeePerGas ? block.baseFeePerGas.mul(2).add(maxPriorityFeePerGas) : maxPriorityFeePerGas;
+        return {
+          maxFeePerGas,
+          maxPriorityFeePerGas
+        };
+      });
+      const legacyGasPrice = provider => __awaiter(void 0, void 0, void 0, function* () {
+        const gas = yield provider.getGasPrice();
+        return {
+          maxFeePerGas: gas,
+          maxPriorityFeePerGas: gas
+        };
+      });
+      const getGasPrice = provider => ctx => __awaiter(void 0, void 0, void 0, function* () {
+        let eip1559Error;
+        try {
+          const {
+            maxFeePerGas,
+            maxPriorityFeePerGas
+          } = yield eip1559GasPrice(provider);
+          ctx.op.maxFeePerGas = maxFeePerGas;
+          ctx.op.maxPriorityFeePerGas = maxPriorityFeePerGas;
+          return;
+        } catch (error) {
+          eip1559Error = error;
+          console.warn("getGas: eth_maxPriorityFeePerGas failed, falling back to legacy gas price.");
+        }
+        try {
+          const {
+            maxFeePerGas,
+            maxPriorityFeePerGas
+          } = yield legacyGasPrice(provider);
+          ctx.op.maxFeePerGas = maxFeePerGas;
+          ctx.op.maxPriorityFeePerGas = maxPriorityFeePerGas;
+          return;
+        } catch (error) {
+          throw new Error(`${eip1559Error}, ${error}`);
+        }
+      });
+      exports.getGasPrice = getGasPrice;
+    }, {
+      "ethers": 176
+    }],
+    260: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __exportStar = this && this.__exportStar || function (m, exports) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      __exportStar(require("./gasLimit"), exports);
+      __exportStar(require("./gasPrice"), exports);
+      __exportStar(require("./paymaster"), exports);
+      __exportStar(require("./signature"), exports);
+    }, {
+      "./gasLimit": 258,
+      "./gasPrice": 259,
+      "./paymaster": 261,
+      "./signature": 262
+    }],
+    261: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.verifyingPaymaster = void 0;
+      const ethers_1 = require("ethers");
+      const utils_1 = require("../../utils");
+      const verifyingPaymaster = (paymasterRpc, context) => ctx => __awaiter(void 0, void 0, void 0, function* () {
+        ctx.op.verificationGasLimit = ethers_1.ethers.BigNumber.from(ctx.op.verificationGasLimit).mul(3);
+        const provider = new ethers_1.ethers.providers.JsonRpcProvider(paymasterRpc);
+        const pm = yield provider.send("pm_sponsorUserOperation", [(0, utils_1.OpToJSON)(ctx.op), ctx.entryPoint, context]);
+        ctx.op.paymasterAndData = pm.paymasterAndData;
+        ctx.op.preVerificationGas = pm.preVerificationGas;
+        ctx.op.verificationGasLimit = pm.verificationGasLimit;
+        ctx.op.callGasLimit = pm.callGasLimit;
+      });
+      exports.verifyingPaymaster = verifyingPaymaster;
+    }, {
+      "../../utils": 275,
+      "ethers": 176
+    }],
+    262: [function (require, module, exports) {
+      "use strict";
+
+      var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function (resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.EOASignature = void 0;
+      const ethers_1 = require("ethers");
+      const EOASignature = signer => ctx => __awaiter(void 0, void 0, void 0, function* () {
+        ctx.op.signature = yield signer.signMessage(ethers_1.ethers.utils.arrayify(ctx.getUserOpHash()));
+      });
+      exports.EOASignature = EOASignature;
+    }, {
+      "ethers": 176
+    }],
+    263: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.BundlerJsonRpcProvider = void 0;
+      const ethers_1 = require("ethers");
+      class BundlerJsonRpcProvider extends ethers_1.ethers.providers.JsonRpcProvider {
+        constructor() {
+          super(...arguments);
+          this.bundlerMethods = new Set(["eth_sendUserOperation", "eth_estimateUserOperationGas", "eth_getUserOperationByHash", "eth_getUserOperationReceipt", "eth_supportedEntryPoints"]);
+        }
+        setBundlerRpc(bundlerRpc) {
+          if (bundlerRpc) {
+            this.bundlerRpc = new ethers_1.ethers.providers.JsonRpcProvider(bundlerRpc);
+          }
+          return this;
+        }
+        send(method, params) {
+          if (this.bundlerRpc && this.bundlerMethods.has(method)) {
+            return this.bundlerRpc.send(method, params);
+          }
+          return super.send(method, params);
+        }
+      }
+      exports.BundlerJsonRpcProvider = BundlerJsonRpcProvider;
+    }, {
+      "ethers": 176
+    }],
+    264: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.ECDSAKernelFactory__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "contract KernelFactory",
+          name: "_singletonFactory",
+          type: "address"
+        }, {
+          internalType: "contract ECDSAValidator",
+          name: "_validator",
+          type: "address"
+        }, {
+          internalType: "contract IEntryPoint",
+          name: "_entryPoint",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "_owner",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "_index",
+          type: "uint256"
+        }],
+        name: "createAccount",
+        outputs: [{
+          internalType: "contract EIP1967Proxy",
+          name: "proxy",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "entryPoint",
+        outputs: [{
+          internalType: "contract IEntryPoint",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "_owner",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "_index",
+          type: "uint256"
+        }],
+        name: "getAccountAddress",
+        outputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "singletonFactory",
+        outputs: [{
+          internalType: "contract KernelFactory",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "validator",
+        outputs: [{
+          internalType: "contract ECDSAValidator",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }];
+      class ECDSAKernelFactory__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.ECDSAKernelFactory__factory = ECDSAKernelFactory__factory;
+      ECDSAKernelFactory__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    265: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.ECDSAValidator__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "kernel",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "oldOwner",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "newOwner",
+          type: "address"
+        }],
+        name: "OwnerChanged",
+        type: "event"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "disable",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        name: "ecdsaValidatorStorage",
+        outputs: [{
+          internalType: "address",
+          name: "owner",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes"
+        }],
+        name: "enable",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes32",
+          name: "hash",
+          type: "bytes32"
+        }, {
+          internalType: "bytes",
+          name: "signature",
+          type: "bytes"
+        }],
+        name: "validateSignature",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "_userOp",
+          type: "tuple"
+        }, {
+          internalType: "bytes32",
+          name: "_userOpHash",
+          type: "bytes32"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        name: "validateUserOp",
+        outputs: [{
+          internalType: "uint256",
+          name: "validationData",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }];
+      class ECDSAValidator__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.ECDSAValidator__factory = ECDSAValidator__factory;
+      ECDSAValidator__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    266: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.EntryPoint__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "uint256",
+          name: "preOpGas",
+          type: "uint256"
+        }, {
+          internalType: "uint256",
+          name: "paid",
+          type: "uint256"
+        }, {
+          internalType: "uint48",
+          name: "validAfter",
+          type: "uint48"
+        }, {
+          internalType: "uint48",
+          name: "validUntil",
+          type: "uint48"
+        }, {
+          internalType: "bool",
+          name: "targetSuccess",
+          type: "bool"
+        }, {
+          internalType: "bytes",
+          name: "targetResult",
+          type: "bytes"
+        }],
+        name: "ExecutionResult",
+        type: "error"
+      }, {
+        inputs: [{
+          internalType: "uint256",
+          name: "opIndex",
+          type: "uint256"
+        }, {
+          internalType: "string",
+          name: "reason",
+          type: "string"
+        }],
+        name: "FailedOp",
+        type: "error"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }],
+        name: "SenderAddressResult",
+        type: "error"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "aggregator",
+          type: "address"
+        }],
+        name: "SignatureValidationFailed",
+        type: "error"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "uint256",
+            name: "preOpGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "prefund",
+            type: "uint256"
+          }, {
+            internalType: "bool",
+            name: "sigFailed",
+            type: "bool"
+          }, {
+            internalType: "uint48",
+            name: "validAfter",
+            type: "uint48"
+          }, {
+            internalType: "uint48",
+            name: "validUntil",
+            type: "uint48"
+          }, {
+            internalType: "bytes",
+            name: "paymasterContext",
+            type: "bytes"
+          }],
+          internalType: "struct IEntryPoint.ReturnInfo",
+          name: "returnInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "senderInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "factoryInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "paymasterInfo",
+          type: "tuple"
+        }],
+        name: "ValidationResult",
+        type: "error"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "uint256",
+            name: "preOpGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "prefund",
+            type: "uint256"
+          }, {
+            internalType: "bool",
+            name: "sigFailed",
+            type: "bool"
+          }, {
+            internalType: "uint48",
+            name: "validAfter",
+            type: "uint48"
+          }, {
+            internalType: "uint48",
+            name: "validUntil",
+            type: "uint48"
+          }, {
+            internalType: "bytes",
+            name: "paymasterContext",
+            type: "bytes"
+          }],
+          internalType: "struct IEntryPoint.ReturnInfo",
+          name: "returnInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "senderInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "factoryInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "uint256",
+            name: "stake",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "unstakeDelaySec",
+            type: "uint256"
+          }],
+          internalType: "struct IStakeManager.StakeInfo",
+          name: "paymasterInfo",
+          type: "tuple"
+        }, {
+          components: [{
+            internalType: "address",
+            name: "aggregator",
+            type: "address"
+          }, {
+            components: [{
+              internalType: "uint256",
+              name: "stake",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "unstakeDelaySec",
+              type: "uint256"
+            }],
+            internalType: "struct IStakeManager.StakeInfo",
+            name: "stakeInfo",
+            type: "tuple"
+          }],
+          internalType: "struct IEntryPoint.AggregatorStakeInfo",
+          name: "aggregatorInfo",
+          type: "tuple"
+        }],
+        name: "ValidationResultWithAggregation",
+        type: "error"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "bytes32",
+          name: "userOpHash",
+          type: "bytes32"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "address",
+          name: "factory",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "address",
+          name: "paymaster",
+          type: "address"
+        }],
+        name: "AccountDeployed",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [],
+        name: "BeforeExecution",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "totalDeposit",
+          type: "uint256"
+        }],
+        name: "Deposited",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "aggregator",
+          type: "address"
+        }],
+        name: "SignatureAggregatorChanged",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "totalStaked",
+          type: "uint256"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "unstakeDelaySec",
+          type: "uint256"
+        }],
+        name: "StakeLocked",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "withdrawTime",
+          type: "uint256"
+        }],
+        name: "StakeUnlocked",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "address",
+          name: "withdrawAddress",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256"
+        }],
+        name: "StakeWithdrawn",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "bytes32",
+          name: "userOpHash",
+          type: "bytes32"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "paymaster",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "nonce",
+          type: "uint256"
+        }, {
+          indexed: false,
+          internalType: "bool",
+          name: "success",
+          type: "bool"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "actualGasCost",
+          type: "uint256"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "actualGasUsed",
+          type: "uint256"
+        }],
+        name: "UserOperationEvent",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "bytes32",
+          name: "userOpHash",
+          type: "bytes32"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "nonce",
+          type: "uint256"
+        }, {
+          indexed: false,
+          internalType: "bytes",
+          name: "revertReason",
+          type: "bytes"
+        }],
+        name: "UserOperationRevertReason",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "address",
+          name: "withdrawAddress",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256"
+        }],
+        name: "Withdrawn",
+        type: "event"
+      }, {
+        inputs: [],
+        name: "SIG_VALIDATION_FAILED",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "initCode",
+          type: "bytes"
+        }, {
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "paymasterAndData",
+          type: "bytes"
+        }],
+        name: "_validateSenderAndPaymaster",
+        outputs: [],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "uint32",
+          name: "unstakeDelaySec",
+          type: "uint32"
+        }],
+        name: "addStake",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }],
+        name: "balanceOf",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }],
+        name: "depositTo",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        name: "deposits",
+        outputs: [{
+          internalType: "uint112",
+          name: "deposit",
+          type: "uint112"
+        }, {
+          internalType: "bool",
+          name: "staked",
+          type: "bool"
+        }, {
+          internalType: "uint112",
+          name: "stake",
+          type: "uint112"
+        }, {
+          internalType: "uint32",
+          name: "unstakeDelaySec",
+          type: "uint32"
+        }, {
+          internalType: "uint48",
+          name: "withdrawTime",
+          type: "uint48"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }],
+        name: "getDepositInfo",
+        outputs: [{
+          components: [{
+            internalType: "uint112",
+            name: "deposit",
+            type: "uint112"
+          }, {
+            internalType: "bool",
+            name: "staked",
+            type: "bool"
+          }, {
+            internalType: "uint112",
+            name: "stake",
+            type: "uint112"
+          }, {
+            internalType: "uint32",
+            name: "unstakeDelaySec",
+            type: "uint32"
+          }, {
+            internalType: "uint48",
+            name: "withdrawTime",
+            type: "uint48"
+          }],
+          internalType: "struct IStakeManager.DepositInfo",
+          name: "info",
+          type: "tuple"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "sender",
+          type: "address"
+        }, {
+          internalType: "uint192",
+          name: "key",
+          type: "uint192"
+        }],
+        name: "getNonce",
+        outputs: [{
+          internalType: "uint256",
+          name: "nonce",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "initCode",
+          type: "bytes"
+        }],
+        name: "getSenderAddress",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "userOp",
+          type: "tuple"
+        }],
+        name: "getUserOpHash",
+        outputs: [{
+          internalType: "bytes32",
+          name: "",
+          type: "bytes32"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            components: [{
+              internalType: "address",
+              name: "sender",
+              type: "address"
+            }, {
+              internalType: "uint256",
+              name: "nonce",
+              type: "uint256"
+            }, {
+              internalType: "bytes",
+              name: "initCode",
+              type: "bytes"
+            }, {
+              internalType: "bytes",
+              name: "callData",
+              type: "bytes"
+            }, {
+              internalType: "uint256",
+              name: "callGasLimit",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "verificationGasLimit",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "preVerificationGas",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "maxFeePerGas",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "maxPriorityFeePerGas",
+              type: "uint256"
+            }, {
+              internalType: "bytes",
+              name: "paymasterAndData",
+              type: "bytes"
+            }, {
+              internalType: "bytes",
+              name: "signature",
+              type: "bytes"
+            }],
+            internalType: "struct UserOperation[]",
+            name: "userOps",
+            type: "tuple[]"
+          }, {
+            internalType: "contract IAggregator",
+            name: "aggregator",
+            type: "address"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct IEntryPoint.UserOpsPerAggregator[]",
+          name: "opsPerAggregator",
+          type: "tuple[]"
+        }, {
+          internalType: "address payable",
+          name: "beneficiary",
+          type: "address"
+        }],
+        name: "handleAggregatedOps",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation[]",
+          name: "ops",
+          type: "tuple[]"
+        }, {
+          internalType: "address payable",
+          name: "beneficiary",
+          type: "address"
+        }],
+        name: "handleOps",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "uint192",
+          name: "key",
+          type: "uint192"
+        }],
+        name: "incrementNonce",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "callData",
+          type: "bytes"
+        }, {
+          components: [{
+            components: [{
+              internalType: "address",
+              name: "sender",
+              type: "address"
+            }, {
+              internalType: "uint256",
+              name: "nonce",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "callGasLimit",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "verificationGasLimit",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "preVerificationGas",
+              type: "uint256"
+            }, {
+              internalType: "address",
+              name: "paymaster",
+              type: "address"
+            }, {
+              internalType: "uint256",
+              name: "maxFeePerGas",
+              type: "uint256"
+            }, {
+              internalType: "uint256",
+              name: "maxPriorityFeePerGas",
+              type: "uint256"
+            }],
+            internalType: "struct EntryPoint.MemoryUserOp",
+            name: "mUserOp",
+            type: "tuple"
+          }, {
+            internalType: "bytes32",
+            name: "userOpHash",
+            type: "bytes32"
+          }, {
+            internalType: "uint256",
+            name: "prefund",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "contextOffset",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preOpGas",
+            type: "uint256"
+          }],
+          internalType: "struct EntryPoint.UserOpInfo",
+          name: "opInfo",
+          type: "tuple"
+        }, {
+          internalType: "bytes",
+          name: "context",
+          type: "bytes"
+        }],
+        name: "innerHandleOp",
+        outputs: [{
+          internalType: "uint256",
+          name: "actualGasCost",
+          type: "uint256"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint192",
+          name: "",
+          type: "uint192"
+        }],
+        name: "nonceSequenceNumber",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "op",
+          type: "tuple"
+        }, {
+          internalType: "address",
+          name: "target",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "targetCallData",
+          type: "bytes"
+        }],
+        name: "simulateHandleOp",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "userOp",
+          type: "tuple"
+        }],
+        name: "simulateValidation",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "unlockStake",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address payable",
+          name: "withdrawAddress",
+          type: "address"
+        }],
+        name: "withdrawStake",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address payable",
+          name: "withdrawAddress",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "withdrawAmount",
+          type: "uint256"
+        }],
+        name: "withdrawTo",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        stateMutability: "payable",
+        type: "receive"
+      }];
+      class EntryPoint__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.EntryPoint__factory = EntryPoint__factory;
+      EntryPoint__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    267: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.KernelFactory__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "contract IEntryPoint",
+          name: "_entryPoint",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "validator",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "bytes",
+          name: "data",
+          type: "bytes"
+        }, {
+          indexed: false,
+          internalType: "uint256",
+          name: "index",
+          type: "uint256"
+        }],
+        name: "AccountCreated",
+        type: "event"
+      }, {
+        inputs: [{
+          internalType: "contract IKernelValidator",
+          name: "_validator",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes"
+        }, {
+          internalType: "uint256",
+          name: "_index",
+          type: "uint256"
+        }],
+        name: "createAccount",
+        outputs: [{
+          internalType: "contract EIP1967Proxy",
+          name: "proxy",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "entryPoint",
+        outputs: [{
+          internalType: "contract IEntryPoint",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "contract IKernelValidator",
+          name: "_validator",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes"
+        }, {
+          internalType: "uint256",
+          name: "_index",
+          type: "uint256"
+        }],
+        name: "getAccountAddress",
+        outputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "kernelTemplate",
+        outputs: [{
+          internalType: "contract TempKernel",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "nextTemplate",
+        outputs: [{
+          internalType: "contract Kernel",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }];
+      class KernelFactory__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.KernelFactory__factory = KernelFactory__factory;
+      KernelFactory__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    268: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Kernel__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "contract IEntryPoint",
+          name: "_entryPoint",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "oldValidator",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "newValidator",
+          type: "address"
+        }],
+        name: "DefaultValidatorChanged",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "bytes4",
+          name: "selector",
+          type: "bytes4"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "executor",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "validator",
+          type: "address"
+        }],
+        name: "ExecutionChanged",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "newImplementation",
+          type: "address"
+        }],
+        name: "Upgraded",
+        type: "event"
+      }, {
+        stateMutability: "payable",
+        type: "fallback"
+      }, {
+        inputs: [{
+          internalType: "bytes4",
+          name: "_disableFlag",
+          type: "bytes4"
+        }],
+        name: "disableMode",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "entryPoint",
+        outputs: [{
+          internalType: "contract IEntryPoint",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "to",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "value",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes"
+        }, {
+          internalType: "enum Operation",
+          name: "operation",
+          type: "uint8"
+        }],
+        name: "execute",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getDefaultValidator",
+        outputs: [{
+          internalType: "contract IKernelValidator",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getDisabledMode",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes4",
+          name: "_selector",
+          type: "bytes4"
+        }],
+        name: "getExecution",
+        outputs: [{
+          components: [{
+            internalType: "uint48",
+            name: "validUntil",
+            type: "uint48"
+          }, {
+            internalType: "uint48",
+            name: "validAfter",
+            type: "uint48"
+          }, {
+            internalType: "address",
+            name: "executor",
+            type: "address"
+          }, {
+            internalType: "contract IKernelValidator",
+            name: "validator",
+            type: "address"
+          }],
+          internalType: "struct ExecutionDetail",
+          name: "",
+          type: "tuple"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getLastDisabledTime",
+        outputs: [{
+          internalType: "uint48",
+          name: "",
+          type: "uint48"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "uint192",
+          name: "key",
+          type: "uint192"
+        }],
+        name: "getNonce",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getNonce",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "contract IKernelValidator",
+          name: "_defaultValidator",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes"
+        }],
+        name: "initialize",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes32",
+          name: "hash",
+          type: "bytes32"
+        }, {
+          internalType: "bytes",
+          name: "signature",
+          type: "bytes"
+        }],
+        name: "isValidSignature",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "name",
+        outputs: [{
+          internalType: "string",
+          name: "",
+          type: "string"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256[]",
+          name: "",
+          type: "uint256[]"
+        }, {
+          internalType: "uint256[]",
+          name: "",
+          type: "uint256[]"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC1155BatchReceived",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC1155Received",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC721Received",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "contract IKernelValidator",
+          name: "_defaultValidator",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes"
+        }],
+        name: "setDefaultValidator",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes4",
+          name: "_selector",
+          type: "bytes4"
+        }, {
+          internalType: "address",
+          name: "_executor",
+          type: "address"
+        }, {
+          internalType: "contract IKernelValidator",
+          name: "_validator",
+          type: "address"
+        }, {
+          internalType: "uint48",
+          name: "_validUntil",
+          type: "uint48"
+        }, {
+          internalType: "uint48",
+          name: "_validAfter",
+          type: "uint48"
+        }, {
+          internalType: "bytes",
+          name: "_enableData",
+          type: "bytes"
+        }],
+        name: "setExecution",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "_newImplementation",
+          type: "address"
+        }],
+        name: "upgradeTo",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "userOp",
+          type: "tuple"
+        }, {
+          internalType: "bytes32",
+          name: "userOpHash",
+          type: "bytes32"
+        }, {
+          internalType: "uint256",
+          name: "missingAccountFunds",
+          type: "uint256"
+        }],
+        name: "validateUserOp",
+        outputs: [{
+          internalType: "uint256",
+          name: "validationData",
+          type: "uint256"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "version",
+        outputs: [{
+          internalType: "string",
+          name: "",
+          type: "string"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        stateMutability: "payable",
+        type: "receive"
+      }];
+      class Kernel__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.Kernel__factory = Kernel__factory;
+      Kernel__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    269: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.Multisend__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        inputs: [{
+          internalType: "bytes",
+          name: "transactions",
+          type: "bytes"
+        }],
+        name: "multiSend",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function"
+      }];
+      class Multisend__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.Multisend__factory = Multisend__factory;
+      Multisend__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    270: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.SimpleAccountFactory__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "contract IEntryPoint",
+          name: "_entryPoint",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        inputs: [],
+        name: "accountImplementation",
+        outputs: [{
+          internalType: "contract SimpleAccount",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "owner",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "salt",
+          type: "uint256"
+        }],
+        name: "createAccount",
+        outputs: [{
+          internalType: "contract SimpleAccount",
+          name: "ret",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "owner",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "salt",
+          type: "uint256"
+        }],
+        name: "getAddress",
+        outputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }];
+      class SimpleAccountFactory__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.SimpleAccountFactory__factory = SimpleAccountFactory__factory;
+      SimpleAccountFactory__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    271: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.SimpleAccount__factory = void 0;
+      const ethers_1 = require("ethers");
+      const _abi = [{
+        inputs: [{
+          internalType: "contract IEntryPoint",
+          name: "anEntryPoint",
+          type: "address"
+        }],
+        stateMutability: "nonpayable",
+        type: "constructor"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: false,
+          internalType: "address",
+          name: "previousAdmin",
+          type: "address"
+        }, {
+          indexed: false,
+          internalType: "address",
+          name: "newAdmin",
+          type: "address"
+        }],
+        name: "AdminChanged",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "beacon",
+          type: "address"
+        }],
+        name: "BeaconUpgraded",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: false,
+          internalType: "uint8",
+          name: "version",
+          type: "uint8"
+        }],
+        name: "Initialized",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "contract IEntryPoint",
+          name: "entryPoint",
+          type: "address"
+        }, {
+          indexed: true,
+          internalType: "address",
+          name: "owner",
+          type: "address"
+        }],
+        name: "SimpleAccountInitialized",
+        type: "event"
+      }, {
+        anonymous: false,
+        inputs: [{
+          indexed: true,
+          internalType: "address",
+          name: "implementation",
+          type: "address"
+        }],
+        name: "Upgraded",
+        type: "event"
+      }, {
+        inputs: [],
+        name: "addDeposit",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "entryPoint",
+        outputs: [{
+          internalType: "contract IEntryPoint",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "dest",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "value",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "func",
+          type: "bytes"
+        }],
+        name: "execute",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address[]",
+          name: "dest",
+          type: "address[]"
+        }, {
+          internalType: "bytes[]",
+          name: "func",
+          type: "bytes[]"
+        }],
+        name: "executeBatch",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getDeposit",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "getNonce",
+        outputs: [{
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "anOwner",
+          type: "address"
+        }],
+        name: "initialize",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256[]",
+          name: "",
+          type: "uint256[]"
+        }, {
+          internalType: "uint256[]",
+          name: "",
+          type: "uint256[]"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC1155BatchReceived",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC1155Received",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "onERC721Received",
+        outputs: [{
+          internalType: "bytes4",
+          name: "",
+          type: "bytes4"
+        }],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "owner",
+        outputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [],
+        name: "proxiableUUID",
+        outputs: [{
+          internalType: "bytes32",
+          name: "",
+          type: "bytes32"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "bytes4",
+          name: "interfaceId",
+          type: "bytes4"
+        }],
+        name: "supportsInterface",
+        outputs: [{
+          internalType: "bool",
+          name: "",
+          type: "bool"
+        }],
+        stateMutability: "view",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "address",
+          name: "",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "",
+          type: "uint256"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }, {
+          internalType: "bytes",
+          name: "",
+          type: "bytes"
+        }],
+        name: "tokensReceived",
+        outputs: [],
+        stateMutability: "pure",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "newImplementation",
+          type: "address"
+        }],
+        name: "upgradeTo",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address",
+          name: "newImplementation",
+          type: "address"
+        }, {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes"
+        }],
+        name: "upgradeToAndCall",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function"
+      }, {
+        inputs: [{
+          components: [{
+            internalType: "address",
+            name: "sender",
+            type: "address"
+          }, {
+            internalType: "uint256",
+            name: "nonce",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "initCode",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "callData",
+            type: "bytes"
+          }, {
+            internalType: "uint256",
+            name: "callGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "verificationGasLimit",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "uint256",
+            name: "maxPriorityFeePerGas",
+            type: "uint256"
+          }, {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes"
+          }, {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes"
+          }],
+          internalType: "struct UserOperation",
+          name: "userOp",
+          type: "tuple"
+        }, {
+          internalType: "bytes32",
+          name: "userOpHash",
+          type: "bytes32"
+        }, {
+          internalType: "uint256",
+          name: "missingAccountFunds",
+          type: "uint256"
+        }],
+        name: "validateUserOp",
+        outputs: [{
+          internalType: "uint256",
+          name: "validationData",
+          type: "uint256"
+        }],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        inputs: [{
+          internalType: "address payable",
+          name: "withdrawAddress",
+          type: "address"
+        }, {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256"
+        }],
+        name: "withdrawDepositTo",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function"
+      }, {
+        stateMutability: "payable",
+        type: "receive"
+      }];
+      class SimpleAccount__factory {
+        static createInterface() {
+          return new ethers_1.utils.Interface(_abi);
+        }
+        static connect(address, signerOrProvider) {
+          return new ethers_1.Contract(address, _abi, signerOrProvider);
+        }
+      }
+      exports.SimpleAccount__factory = SimpleAccount__factory;
+      SimpleAccount__factory.abi = _abi;
+    }, {
+      "ethers": 176
+    }],
+    272: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.SimpleAccountFactory__factory = exports.SimpleAccount__factory = exports.Multisend__factory = exports.KernelFactory__factory = exports.Kernel__factory = exports.EntryPoint__factory = exports.ECDSAValidator__factory = exports.ECDSAKernelFactory__factory = void 0;
+      var ECDSAKernelFactory__factory_1 = require("./ECDSAKernelFactory__factory");
+      Object.defineProperty(exports, "ECDSAKernelFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return ECDSAKernelFactory__factory_1.ECDSAKernelFactory__factory;
+        }
+      });
+      var ECDSAValidator__factory_1 = require("./ECDSAValidator__factory");
+      Object.defineProperty(exports, "ECDSAValidator__factory", {
+        enumerable: true,
+        get: function () {
+          return ECDSAValidator__factory_1.ECDSAValidator__factory;
+        }
+      });
+      var EntryPoint__factory_1 = require("./EntryPoint__factory");
+      Object.defineProperty(exports, "EntryPoint__factory", {
+        enumerable: true,
+        get: function () {
+          return EntryPoint__factory_1.EntryPoint__factory;
+        }
+      });
+      var Kernel__factory_1 = require("./Kernel__factory");
+      Object.defineProperty(exports, "Kernel__factory", {
+        enumerable: true,
+        get: function () {
+          return Kernel__factory_1.Kernel__factory;
+        }
+      });
+      var KernelFactory__factory_1 = require("./KernelFactory__factory");
+      Object.defineProperty(exports, "KernelFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return KernelFactory__factory_1.KernelFactory__factory;
+        }
+      });
+      var Multisend__factory_1 = require("./Multisend__factory");
+      Object.defineProperty(exports, "Multisend__factory", {
+        enumerable: true,
+        get: function () {
+          return Multisend__factory_1.Multisend__factory;
+        }
+      });
+      var SimpleAccount__factory_1 = require("./SimpleAccount__factory");
+      Object.defineProperty(exports, "SimpleAccount__factory", {
+        enumerable: true,
+        get: function () {
+          return SimpleAccount__factory_1.SimpleAccount__factory;
+        }
+      });
+      var SimpleAccountFactory__factory_1 = require("./SimpleAccountFactory__factory");
+      Object.defineProperty(exports, "SimpleAccountFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return SimpleAccountFactory__factory_1.SimpleAccountFactory__factory;
+        }
+      });
+    }, {
+      "./ECDSAKernelFactory__factory": 264,
+      "./ECDSAValidator__factory": 265,
+      "./EntryPoint__factory": 266,
+      "./KernelFactory__factory": 267,
+      "./Kernel__factory": 268,
+      "./Multisend__factory": 269,
+      "./SimpleAccountFactory__factory": 270,
+      "./SimpleAccount__factory": 271
+    }],
+    273: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+        Object.defineProperty(o, "default", {
+          enumerable: true,
+          value: v
+        });
+      } : function (o, v) {
+        o["default"] = v;
+      });
+      var __importStar = this && this.__importStar || function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+        __setModuleDefault(result, mod);
+        return result;
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.SimpleAccountFactory__factory = exports.SimpleAccount__factory = exports.Multisend__factory = exports.KernelFactory__factory = exports.Kernel__factory = exports.EntryPoint__factory = exports.ECDSAValidator__factory = exports.ECDSAKernelFactory__factory = exports.factories = void 0;
+      exports.factories = __importStar(require("./factories"));
+      var ECDSAKernelFactory__factory_1 = require("./factories/ECDSAKernelFactory__factory");
+      Object.defineProperty(exports, "ECDSAKernelFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return ECDSAKernelFactory__factory_1.ECDSAKernelFactory__factory;
+        }
+      });
+      var ECDSAValidator__factory_1 = require("./factories/ECDSAValidator__factory");
+      Object.defineProperty(exports, "ECDSAValidator__factory", {
+        enumerable: true,
+        get: function () {
+          return ECDSAValidator__factory_1.ECDSAValidator__factory;
+        }
+      });
+      var EntryPoint__factory_1 = require("./factories/EntryPoint__factory");
+      Object.defineProperty(exports, "EntryPoint__factory", {
+        enumerable: true,
+        get: function () {
+          return EntryPoint__factory_1.EntryPoint__factory;
+        }
+      });
+      var Kernel__factory_1 = require("./factories/Kernel__factory");
+      Object.defineProperty(exports, "Kernel__factory", {
+        enumerable: true,
+        get: function () {
+          return Kernel__factory_1.Kernel__factory;
+        }
+      });
+      var KernelFactory__factory_1 = require("./factories/KernelFactory__factory");
+      Object.defineProperty(exports, "KernelFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return KernelFactory__factory_1.KernelFactory__factory;
+        }
+      });
+      var Multisend__factory_1 = require("./factories/Multisend__factory");
+      Object.defineProperty(exports, "Multisend__factory", {
+        enumerable: true,
+        get: function () {
+          return Multisend__factory_1.Multisend__factory;
+        }
+      });
+      var SimpleAccount__factory_1 = require("./factories/SimpleAccount__factory");
+      Object.defineProperty(exports, "SimpleAccount__factory", {
+        enumerable: true,
+        get: function () {
+          return SimpleAccount__factory_1.SimpleAccount__factory;
+        }
+      });
+      var SimpleAccountFactory__factory_1 = require("./factories/SimpleAccountFactory__factory");
+      Object.defineProperty(exports, "SimpleAccountFactory__factory", {
+        enumerable: true,
+        get: function () {
+          return SimpleAccountFactory__factory_1.SimpleAccountFactory__factory;
+        }
+      });
+    }, {
+      "./factories": 272,
+      "./factories/ECDSAKernelFactory__factory": 264,
+      "./factories/ECDSAValidator__factory": 265,
+      "./factories/EntryPoint__factory": 266,
+      "./factories/KernelFactory__factory": 267,
+      "./factories/Kernel__factory": 268,
+      "./factories/Multisend__factory": 269,
+      "./factories/SimpleAccountFactory__factory": 270,
+      "./factories/SimpleAccount__factory": 271
+    }],
+    274: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+    }, {}],
+    275: [function (require, module, exports) {
+      "use strict";
+
+      var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            }
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      } : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+      var __exportStar = this && this.__exportStar || function (m, exports) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+      };
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      __exportStar(require("./json"), exports);
+    }, {
+      "./json": 276
+    }],
+    276: [function (require, module, exports) {
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.OpToJSON = void 0;
+      const ethers_1 = require("ethers");
+      const OpToJSON = op => {
+        return Object.keys(op).map(key => {
+          let val = op[key];
+          if (typeof val !== "string" || !val.startsWith("0x")) {
+            val = ethers_1.ethers.utils.hexValue(val);
+          }
+          return [key, val];
+        }).reduce((set, [k, v]) => Object.assign(Object.assign({}, set), {
+          [k]: v
+        }), {});
+      };
+      exports.OpToJSON = OpToJSON;
+    }, {
+      "ethers": 176
+    }],
+    277: [function (require, module, exports) {
       'use strict';
 
       module.exports = function (Yallist) {
@@ -39934,7 +43757,7 @@
         };
       };
     }, {}],
-    247: [function (require, module, exports) {
+    278: [function (require, module, exports) {
       'use strict';
 
       module.exports = Yallist;
@@ -40299,9 +44122,9 @@
         require('./iterator.js')(Yallist);
       } catch (er) {}
     }, {
-      "./iterator.js": 246
+      "./iterator.js": 277
     }],
-    248: [function (require, module, exports) {
+    279: [function (require, module, exports) {
       globalThis.Buffer = require('buffer/').Buffer;
       "use strict";
       Object.defineProperty(exports, "__esModule", {
@@ -40310,12 +44133,15 @@
       exports.onTransaction = exports.onRpcRequest = void 0;
       var _snapsUi = require("@metamask/snaps-ui");
       var _ethers = require("ethers");
+      var _userop = require("userop");
+      const MANAGER_CONTRACT_ADDRESS = '0x2F096E3Cdd774AA4DF12Bc4c2128bc66EdF2F459';
+      const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO';
       const storeSettings = async req => {
         const response = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
-            content: (0, _snapsUi.panel)([(0, _snapsUi.text)('Store your settings')])
+            content: (0, _snapsUi.panel)([(0, _snapsUi.text)('Store your settings'), (0, _snapsUi.text)(JSON.stringify(req))])
           }
         });
         if (!response) return false;
@@ -40326,14 +44152,6 @@
             newState: req
           }
         });
-      };
-      const getBalance = async (address, chainId) => {
-        const response = await window.ethereum.request({
-          method: 'eth_getBalance',
-          id: chainId,
-          params: [address]
-        });
-        return _ethers.BigNumber.from(response);
       };
       const calcCharge = (maxAmount, minAmount, currentBalance) => {
         if (currentBalance > minAmount) {
@@ -40359,40 +44177,74 @@
       const settingErrorContent = {
         content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('AAuto Bridge'), (0, _snapsUi.text)('Hmmm, it looks like the snap setup is not complete 🤔')])
       };
+      const noChargeContent = {
+        content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('AAuto Bridge'), (0, _snapsUi.text)('No automatic bridge will be performed this time as the balance is still sufficient 👌')])
+      };
+      const format = (value, fix) => {
+        if (!fix) {
+          fix = 8;
+        }
+        return parseFloat(_ethers.utils.formatEther(value)).toFixed(fix);
+      };
       const onTransaction = async ({
         transaction,
-        chainId,
-        transactionOrigin
+        chainId
       }) => {
-        console.log(transaction, chainId, transactionOrigin);
+        console.log(transaction);
         const persistedData = await snap.request({
           method: 'snap_manageState',
           params: {
             operation: 'get'
           }
         });
-        if (persistedData == null || persistedData.chains.length == 0 || !persistedData.privateKey) {
+        if (persistedData == null || persistedData.chains.length == 0 || !persistedData.baseChainId || !persistedData.privateKey || !transaction.value) {
           return settingErrorContent;
         }
-        console.log(persistedData);
         const chainIdNum = parseInt(chainId.replace('eip155:', ''), 16);
         const chainIndex = persistedData.chains.findIndex(c => c.chainId == chainIdNum);
         if (chainIndex == -1) {
           return settingErrorContent;
         }
         const chain = persistedData.chains[chainIndex];
-        const balance = await getBalance(transaction.from, chainIdNum);
-        const charge = calcCharge(_ethers.BigNumber.from(chain.maxAmount), _ethers.BigNumber.from(chain.minAmount), balance);
+        const provider = new _ethers.providers.Web3Provider(window.ethereum, chainIdNum);
+        const balance = await provider.getBalance(transaction.from);
+        const nextBalance = balance.sub(_ethers.BigNumber.from(transaction.value));
+        const charge = calcCharge(_ethers.BigNumber.from(chain.maxAmount), _ethers.BigNumber.from(chain.minAmount), nextBalance);
+        if (charge.eq(0)) {
+          return noChargeContent;
+        }
         const wallet = new _ethers.Wallet(persistedData.privateKey);
+        const nonce = await provider.getTransactionCount(transaction.from);
+        const signUserOperation = async ctx => {
+          ctx.op.signature = await wallet.signMessage(ctx.getUserOpHash());
+        };
+        const abi = ['function execute(address to, uint256 chainId, uint256 nonce, uint256 charge)'];
+        const iface = new _ethers.utils.Interface(abi);
+        const calldata = iface.encodeFunctionData('execute', [transaction.from, chainIdNum, nonce, charge]);
+        const destinationChainProvider = new _ethers.providers.AlchemyProvider(persistedData.baseChainId, ALCHEMY_API_KEY);
+        const manager = new _ethers.Contract(MANAGER_CONTRACT_ADDRESS, abi, destinationChainProvider);
+        const estimatedGas = await manager.estimateGas.execute(transaction.from, chainIdNum, nonce, charge);
+        const deposit = _ethers.utils.parseEther('10');
+        const builder = new _userop.UserOperationBuilder().useDefaults({
+          sender: MANAGER_CONTRACT_ADDRESS
+        }).useMiddleware(signUserOperation);
+        builder.setCallData(calldata);
+        const userOp = await builder.buildOp(_userop.Constants.ERC4337.EntryPoint, chainIdNum);
+        console.log(userOp);
+        const chainData = await provider.getNetwork();
+        const destinationChainData = await destinationChainProvider.getNetwork();
+        const totalCost = charge.add(estimatedGas);
+        const explorerURL = 'https://etherscan.io/';
         return {
-          content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('My Transaction Insights'), (0, _snapsUi.text)('Here are the insights:'), (0, _snapsUi.text)(`Your current balance: ${_ethers.utils.formatEther(balance)} ETH`), (0, _snapsUi.text)(`Next charge amount: ${_ethers.utils.formatEther(charge)} ETH`)])
+          content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('🎉 Done AAuto Bridge 🎉'), (0, _snapsUi.text)('Since the balance was not sufficient, an automatic bridge was performed. It takes about a minute to complete the bridge.'), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${destinationChainData.name} deposit`), (0, _snapsUi.text)(`**${format(deposit.sub(totalCost))} ETH**`), (0, _snapsUi.text)(`(-${format(totalCost)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${chainData.name} balance`), (0, _snapsUi.text)(`**${format(_ethers.BigNumber.from(chain.maxAmount))} ETH**`), (0, _snapsUi.text)(`(+${format(charge)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.text)(`Estimated gas fee: ${format(estimatedGas)} ETH`), (0, _snapsUi.text)('Transaction'), (0, _snapsUi.copyable)(explorerURL)])
         };
       };
       exports.onTransaction = onTransaction;
     }, {
       "@metamask/snaps-ui": 126,
       "buffer/": 155,
-      "ethers": 176
+      "ethers": 176,
+      "userop": 253
     }]
-  }, {}, [248])(248);
+  }, {}, [279])(279);
 });

@@ -17,6 +17,9 @@ dependencies:
   ethers:
     specifier: ^5.7.2
     version: 5.7.2
+  userop:
+    specifier: ^0.3.2
+    version: 0.3.2
 
 devDependencies:
   '@jest/globals':
@@ -11712,6 +11715,16 @@ packages:
     dependencies:
       react: 18.2.0
     dev: true
+
+  /userop@0.3.2:
+    resolution: {integrity: sha512-7WbjoH0Brv1nUcB1RbC+l4wmt8a+bu06R/4H5nJKVhnzIkXUYoaj/WG/S/iMvlBna3Dbiev4Qv/o807Xj1HIzA==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      ethers: 5.7.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}

@@ -2,17 +2,25 @@ import {
   OnRpcRequestHandler,
   OnTransactionHandler,
 } from '@metamask/snaps-types'
-import { heading, panel, text } from '@metamask/snaps-ui'
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui'
 import { ApiRequestParams, StoreSettingsRequestParams } from '../types/snapApi'
-import { BigNumber, utils, Wallet } from 'ethers'
+import { BigNumber, utils, Wallet, Contract, providers } from 'ethers'
 import { PersistedData } from '../types/persistedData'
+import {
+  UserOperationBuilder,
+  UserOperationMiddlewareFn,
+  Constants,
+} from 'userop'
+
+const MANAGER_CONTRACT_ADDRESS = '0x2F096E3Cdd774AA4DF12Bc4c2128bc66EdF2F459'
+const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO'
 
 const storeSettings = async (req: StoreSettingsRequestParams) => {
   const response = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
-      content: panel([text('Store your settings')]),
+      content: panel([text('Store your settings'), text(JSON.stringify(req))]),
     },
   })
   if (!response) return false
@@ -24,20 +32,6 @@ const storeSettings = async (req: StoreSettingsRequestParams) => {
       newState: req,
     },
   })
-}
-
-const getBalance = async (
-  address: string,
-  chainId: number,
-): Promise<BigNumber> => {
-  // eslint-disable-next-line
-  const response = await window.ethereum.request({
-    method: 'eth_getBalance',
-    id: chainId,
-    params: [address],
-  })
-
-  return BigNumber.from(response)
 }
 
 const calcCharge = (
@@ -75,29 +69,46 @@ const settingErrorContent = {
   ]),
 }
 
+const noChargeContent = {
+  content: panel([
+    heading('AAuto Bridge'),
+    text(
+      'No automatic bridge will be performed this time as the balance is still sufficient 👌',
+    ),
+  ]),
+}
+
+const format = (value: BigNumber, fix?: number) => {
+  if (!fix) {
+    fix = 8
+  }
+  return parseFloat(utils.formatEther(value)).toFixed(fix)
+}
+
 export const onTransaction: OnTransactionHandler = async ({
   transaction,
   chainId,
-  transactionOrigin,
 }) => {
-  console.log(transaction, chainId, transactionOrigin)
+  console.log(transaction)
 
   const persistedData = (await snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
   })) as PersistedData | null
+
   if (
     persistedData == null ||
     persistedData.chains.length == 0 ||
-    !persistedData.privateKey
+    !persistedData.baseChainId ||
+    !persistedData.privateKey ||
+    !transaction.value
   ) {
     return settingErrorContent
   }
 
-  console.log(persistedData)
+  // TODO: Check timestamp
 
   const chainIdNum = parseInt(chainId.replace('eip155:', ''), 16)
-
   const chainIndex = persistedData.chains.findIndex(
     (c) => c.chainId == chainIdNum,
   )
@@ -106,26 +117,94 @@ export const onTransaction: OnTransactionHandler = async ({
   }
   const chain = persistedData.chains[chainIndex]
 
-  const balance = await getBalance(transaction.from as string, chainIdNum)
+  const provider = new providers.Web3Provider(window.ethereum, chainIdNum)
+
+  const balance = await provider.getBalance(transaction.from as string)
+  const nextBalance = balance.sub(BigNumber.from(transaction.value))
 
   const charge = calcCharge(
     BigNumber.from(chain.maxAmount),
     BigNumber.from(chain.minAmount),
-    balance,
+    nextBalance,
   )
 
-  // TODO: estimated gas
+  if (charge.eq(0)) {
+    return noChargeContent
+  }
 
   const wallet = new Wallet(persistedData.privateKey)
-  // TODO: sign tx
-  // wallet.sendTransaction()
+  const nonce = await provider.getTransactionCount(transaction.from as string)
+  const signUserOperation: UserOperationMiddlewareFn = async (ctx) => {
+    ctx.op.signature = await wallet.signMessage(ctx.getUserOpHash())
+  }
+
+  const abi = [
+    'function execute(address to, uint256 chainId, uint256 nonce, uint256 charge)',
+  ]
+  const iface = new utils.Interface(abi)
+  const calldata = iface.encodeFunctionData('execute', [
+    transaction.from,
+    chainIdNum,
+    nonce,
+    charge,
+  ])
+
+  const destinationChainProvider = new providers.AlchemyProvider(
+    persistedData.baseChainId,
+    ALCHEMY_API_KEY,
+  )
+
+  const manager = new Contract(
+    MANAGER_CONTRACT_ADDRESS,
+    abi,
+    destinationChainProvider,
+  )
+
+  const estimatedGas = await manager.estimateGas.execute(
+    transaction.from,
+    chainIdNum,
+    nonce,
+    charge,
+  )
+
+  // TODO: Get deposit
+  const deposit = utils.parseEther('10')
+
+  const builder = new UserOperationBuilder()
+    .useDefaults({ sender: MANAGER_CONTRACT_ADDRESS })
+    .useMiddleware(signUserOperation)
+  builder.setCallData(calldata)
+  const userOp = await builder.buildOp(Constants.ERC4337.EntryPoint, chainIdNum)
+  console.log(userOp)
+
+  // TODO: Send userOp to server
+
+  const chainData = await provider.getNetwork()
+  const destinationChainData = await destinationChainProvider.getNetwork()
+
+  const totalCost = charge.add(estimatedGas)
+
+  // TODO: Fix url
+  const explorerURL = 'https://etherscan.io/'
 
   return {
     content: panel([
-      heading('My Transaction Insights'),
-      text('Here are the insights:'),
-      text(`Your current balance: ${utils.formatEther(balance)} ETH`),
-      text(`Next charge amount: ${utils.formatEther(charge)} ETH`),
+      heading('🎉 Done AAuto Bridge 🎉'),
+      text(
+        'Since the balance was not sufficient, an automatic bridge was performed. It takes about a minute to complete the bridge.',
+      ),
+      divider(),
+      heading(`${destinationChainData.name} deposit`),
+      text(`**${format(deposit.sub(totalCost))} ETH**`),
+      text(`(-${format(totalCost)} ETH)`),
+      divider(),
+      heading(`${chainData.name} balance`),
+      text(`**${format(BigNumber.from(chain.maxAmount))} ETH**`),
+      text(`(+${format(charge)} ETH)`),
+      divider(),
+      text(`Estimated gas fee: ${format(estimatedGas)} ETH`),
+      text('Transaction'),
+      copyable(explorerURL),
     ]),
   }
 }

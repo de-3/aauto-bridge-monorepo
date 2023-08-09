@@ -1,7 +1,5 @@
+import { PersistedData } from './persistedData'
+
 export type ApiRequestParams = StoreSettingsRequestParams
 
-export type StoreSettingsRequestParams = {
-  maxAmount: string
-  minAmount: string
-  privateKey: string
-}
+export type StoreSettingsRequestParams = PersistedData

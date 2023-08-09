@@ -31,7 +31,8 @@
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "buffer": "^6.0.3",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "userop": "^0.3.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
