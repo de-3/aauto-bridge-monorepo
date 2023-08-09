@@ -65,7 +65,7 @@ contract AccountManager is BaseAccount, Initializable {
         _requireFromEntryPoint();
 
         _validateCondition(to, chainId, nonce, charge);
-        _bridgeToOptimism(to);
+        _bridgeToOptimism(to, charge);
     }
 
     function _validateCondition(
@@ -79,6 +79,7 @@ contract AccountManager is BaseAccount, Initializable {
             uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
             require(nonce > previousNonce, "already executed transaction");
         }
+        // set latest nonce
         chainIdAndNonceByUser[to][chainId] = nonce;
 
         // timestamp check
@@ -88,8 +89,12 @@ contract AccountManager is BaseAccount, Initializable {
         require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
-    function _bridgeToOptimism(address _to) internal {
-        IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo(_to, 0, "0x");
+    function _bridgeToOptimism(address _to, uint256 amount) internal {
+        IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo{value: amount}(
+            _to,
+            0,
+            "0x"
+        );
     }
 
     function validateUserOp(
