@@ -23,13 +23,9 @@ contract AccountManager is BaseAccount, Initializable {
     mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
     mapping(address => uint) lastTransactionsByUser;
 
-    modifier onlyEntryPointOrOwner() {
-        require(
-            msg.sender == address(entryPoint()) || msg.sender == owner,
-            "not entrypoint or owner"
-        );
-        _;
-    }
+    event BridgeExecuted(address to, uint256 amount);
+    event Deposited(address sender, uint256 amount);
+    event Withdrawn(address to, uint256 amount);
 
     constructor(IEntryPoint anEntryPoint, address optimismBridge) {
         _entryPoint = anEntryPoint;
@@ -89,12 +85,13 @@ contract AccountManager is BaseAccount, Initializable {
         require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
-    function _bridgeToOptimism(address _to, uint256 amount) internal {
+    function _bridgeToOptimism(address to, uint256 amount) internal {
         IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo{value: amount}(
-            _to,
+            to,
             0,
             "0x"
         );
+        emit BridgeExecuted(to, amount);
     }
 
     function validateUserOp(
@@ -105,15 +102,16 @@ contract AccountManager is BaseAccount, Initializable {
         _requireFromEntryPoint();
 
         validationData = _validateSignature(userOp, userOpHash);
-        addDepositToEntryPoint();
+        addDepositToEntryPoint(missingAccountFunds);
     }
 
-    function addDepositToEntryPoint() public payable {
-        _entryPoint.depositTo{value: msg.value}(address(this));
+    function addDepositToEntryPoint(uint256 prefunds) public payable {
+        _entryPoint.depositTo{value: msg.value + prefunds}(address(this));
     }
 
     function deposit() public payable {
         depositBalances[msg.sender] += msg.value;
+        emit Deposited(msg.sender, msg.value);
     }
 
     function withdraw(uint256 amount) external {
@@ -123,6 +121,7 @@ contract AccountManager is BaseAccount, Initializable {
         );
         depositBalances[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
+        emit Withdrawn(msg.sender, amount);
     }
 
     function initialize(address userOpAddr) external payable {
