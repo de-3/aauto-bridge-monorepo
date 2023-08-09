@@ -20,11 +20,8 @@ contract AccountManager is BaseAccount, Initializable {
 
     mapping(address => uint256) depositBalances;
     mapping(address => address) userOpAddresses;
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "only owner");
-        _;
-    }
+    mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
+    mapping(address => uint) lastTransactionsByUser;
 
     modifier onlyEntryPointOrOwner() {
         require(
@@ -50,26 +47,49 @@ contract AccountManager is BaseAccount, Initializable {
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
         bytes32 opHash = userOpHash.toEthSignedMessageHash();
-        if (userOpAddresses[userOp.sender] != opHash.recover(userOp.signature))
+        // check if L2 transaction sender is valid
+        if (
+            userOpAddresses[userOp.sender] != opHash.recover(userOp.signature)
+        ) {
             return SIG_VALIDATION_FAILED;
+        }
         return 0;
     }
 
     function execute(
-        address dest,
-        uint256 value,
-        bytes calldata func
-    ) external onlyEntryPointOrOwner {
-        _call(dest, value, func);
+        address to,
+        uint256 chainId,
+        uint256 nonce,
+        uint256 charge
+    ) external {
+        _requireFromEntryPoint();
+
+        _validateCondition(to, chainId, nonce, charge);
+        _bridgeToOptimism(to);
     }
 
-    function _call(address target, uint256 value, bytes memory data) internal {
-        (bool success, bytes memory result) = target.call{value: value}(data);
-        if (!success) {
-            assembly {
-                revert(add(result, 32), mload(result))
-            }
+    function _validateCondition(
+        address to,
+        uint256 chainId,
+        uint256 nonce,
+        uint256 charge
+    ) internal {
+        // nonce + chainID check
+        if (nonce != 0) {
+            uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
+            require(nonce > previousNonce, "already executed transaction");
         }
+        chainIdAndNonceByUser[to][chainId] = nonce;
+
+        // timestamp check
+        require(block.timestamp > lastTransactionsByUser[to] + 10 minutes);
+
+        // enough deposit check
+        require(depositBalances[to] >= charge, "not enough deposit to bridge");
+    }
+
+    function _bridgeToOptimism(address _to) internal {
+        IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo(_to, 0, "0x");
     }
 
     function validateUserOp(
@@ -83,16 +103,8 @@ contract AccountManager is BaseAccount, Initializable {
         addDepositToEntryPoint();
     }
 
-    function _validateCondition() internal {}
-
     function addDepositToEntryPoint() public payable {
         _entryPoint.depositTo{value: msg.value}(address(this));
-    }
-
-    function bridgeToOptimism(address _to) external {
-        _requireFromEntryPoint();
-
-        IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo(_to, 0, "0x");
     }
 
     function deposit() public payable {
