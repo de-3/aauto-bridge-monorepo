@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -24,6 +24,7 @@ contract AccountManager is BaseAccount, Initializable {
     event BridgeExecuted(address to, uint256 amount);
     event Deposited(address sender, uint256 amount);
     event Withdrawn(address to, uint256 amount);
+    event AddedFundsToEntrypoint(uint256 amount);
 
     constructor(IEntryPoint anEntryPoint, address optimismBridge) {
         _entryPoint = anEntryPoint;
@@ -104,6 +105,7 @@ contract AccountManager is BaseAccount, Initializable {
 
     function addDepositToEntryPoint(uint256 prefunds) public payable {
         _entryPoint.depositTo{value: msg.value + prefunds}(address(this));
+        emit AddedFundsToEntrypoint(msg.value + prefunds);
     }
 
     function deposit() public payable {
