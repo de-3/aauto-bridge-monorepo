@@ -16,8 +16,6 @@ contract AccountManager is BaseAccount, Initializable {
     address immutable OPTIMISM_BRIDGE;
     IEntryPoint private immutable _entryPoint;
 
-    address public owner;
-
     mapping(address => uint256) depositBalances;
     mapping(address => address) userOpAddresses;
     mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
@@ -30,7 +28,6 @@ contract AccountManager is BaseAccount, Initializable {
     constructor(IEntryPoint anEntryPoint, address optimismBridge) {
         _entryPoint = anEntryPoint;
         OPTIMISM_BRIDGE = optimismBridge;
-        owner = msg.sender;
         _disableInitializers();
     }
 
