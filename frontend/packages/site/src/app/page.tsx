@@ -1,3 +1,9 @@
+import ClientSideComponent from "./home.client";
+
 export default function Home() {
-  return <main></main>
+  return (
+    <div>
+      <ClientSideComponent />
+    </div>
+  );
 }
