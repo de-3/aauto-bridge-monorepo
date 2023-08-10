@@ -79,7 +79,11 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _requireFromEntryPoint();
 
         validationData = _validateSignature(userOp, userOpHash);
+        // nonce key address check
+        uint160 key = uint160(userOp.nonce >> 64);
+        require(key == uint160(userOpAddresses[userOp.sender]));
 
+        _validateCondition(userOp.callData);
         addDepositToEntryPoint(missingAccountFunds);
     }
 
