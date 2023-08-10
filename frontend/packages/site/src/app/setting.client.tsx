@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import Deposit from "./deposit.client";
 
 function Step11(props:any){
     const handleMaxChargeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,18 +17,6 @@ function Step11(props:any){
             <input type="number" max={1} min={0} value={props.maxCharge} onChange={handleMaxChargeChange} />
             <label>chargeThreshold</label>
             <input type="number" max={1} min={0} value={props.chargeThreshold} onChange={handleChargeThresholdChange} />
-        </>
-    )
-}
-
-function Step2(props:any){
-    const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        props.setDeposit(e.target.value)
-    }
-    return (
-        <>
-            <label>Deposit</label>
-            <input type="number" min={0} value={props.deposit} onChange={handleDepositChange} />
         </>
     )
 }
@@ -59,7 +48,7 @@ export default function Setting(props:any) {
             </h2>
             {
                 props.firstSettingStatus === 1 ? <Step11 maxCharge={maxCharge} setMaxCharge={setMaxCharge} chargeThreshold={chargeThreshold} setChargeThreshold={setChargeThreshold} /> : (
-                    props.firstSettingStatus === 2 ? <Step2 deposit={deposit} setDeposit={setDeposit} /> : <Step3 />
+                    props.firstSettingStatus === 2 ? <Deposit deposit={deposit} setDeposit={setDeposit} /> : <Step3 />
                 )
             }
             <button onClick={handleConnecting} style={{display:props.firstSettingStatus === 3 ? "none":""}} >{props.firstSettingStatus === 1 ? "Next" : "Deposit"} </button>

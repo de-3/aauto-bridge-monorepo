@@ -2,10 +2,14 @@
 
 import { useState } from "react"
 import Deposit from "./deposit.client"
+import Settings from "./settings.client"
 
 export default function Menu() {
     const [isDeposit,setIsDeposit] = useState(false)
     const [isSettings,setIsSettings] = useState(false)
+    const [deposit,setDeposit] = useState(1)
+    const [maxCharge,setMaxCharge] = useState(1)
+    const [chargeThreshold,setChargeThreshold] = useState(0.5)
 
     const handleDepositClick = () => {
         setIsDeposit(!isDeposit)
@@ -13,6 +17,9 @@ export default function Menu() {
 
     const handleSettingsClick = () => {
         setIsSettings(!isSettings)
+    }
+
+    const handlAddClick = () => {
     }
     return (
         <div>
@@ -25,9 +32,9 @@ export default function Menu() {
                     </>
                 ):(
                     isDeposit ? (
-                        <Deposit />
+                        <Deposit deposit={deposit} setDeposit={setDeposit} />
                     ) : (
-                        <Settings />
+                        <Settings maxCharge={maxCharge} setMaxCharge={setMaxCharge} chargeThreshold={chargeThreshold} setChargeThreshold={setChargeThreshold} handlAddClick={handlAddClick} />
                     )
                 )
             }
