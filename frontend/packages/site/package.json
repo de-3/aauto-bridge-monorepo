@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "run-z --then next dev",
+    "dev:proxy": "run-z --then local-ssl-proxy --key ../../../localhost-key.pem --cert ../../../localhost.pem --source 3001 --target 3000",
+    "devs": "run-z dev:proxy,dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -35,6 +37,8 @@
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.2.1",
-    "prettier": "^3.0.1"
+    "local-ssl-proxy": "^2.0.5",
+    "prettier": "^3.0.1",
+    "run-z": "^1.11.0"
   }
 }
