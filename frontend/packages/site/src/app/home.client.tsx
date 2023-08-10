@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import Connect from "./connect";
+import Setting from "./setting.client";
 
 export default function ClientSideComponent() {
     const [isConnecring,setIsConnecting] = useState(false)
@@ -10,13 +11,12 @@ export default function ClientSideComponent() {
         <div>
             {
                 firstSettingStatus === 0 ? (
-
                     <Connect isConnecring={isConnecring} setIsConnecting={setIsConnecting} setFirstSettingStatus={setFirstSettingStatus} />
                 ) : (
-                    firstSettingStatus === 5 ? (
+                    firstSettingStatus === 4 ? (
                         <h2>メニュー</h2>
                     ):(
-                        <h2>Setting</h2>
+                        <Setting firstSettingStatus={firstSettingStatus} setFirstSettingStatus={setFirstSettingStatus} />
                     )
                 )
             }
