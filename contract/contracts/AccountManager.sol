@@ -3,12 +3,13 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 
 import "./interfaces/IOptimismBridge.sol";
 
-contract AccountManager is BaseAccount, Initializable {
+contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     using ECDSA for bytes32;
 
     bytes4 private constant VALID_SIG = 0x1626ba7e;
@@ -19,7 +20,7 @@ contract AccountManager is BaseAccount, Initializable {
     mapping(address => uint256) depositBalances;
     mapping(address => address) userOpAddresses;
     mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
-    mapping(address => uint) lastTransactionsByUser;
+    mapping(address => uint) lastTransactionTimestampsByUser;
 
     event BridgeExecuted(address to, uint256 amount);
     event Deposited(address sender, uint256 amount);
@@ -58,29 +59,7 @@ contract AccountManager is BaseAccount, Initializable {
     ) external {
         _requireFromEntryPoint();
 
-        _validateCondition(to, chainId, nonce, charge);
         _bridgeToOptimism(to, charge);
-    }
-
-    function _validateCondition(
-        address to,
-        uint256 chainId,
-        uint256 nonce,
-        uint256 charge
-    ) internal {
-        // nonce + chainID check
-        if (nonce != 0) {
-            uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
-            require(nonce > previousNonce, "already executed transaction");
-        }
-        // set latest nonce
-        chainIdAndNonceByUser[to][chainId] = nonce;
-
-        // timestamp check
-        require(block.timestamp > lastTransactionsByUser[to] + 10 minutes);
-
-        // enough deposit check
-        require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
     function _bridgeToOptimism(address to, uint256 amount) internal {
@@ -100,7 +79,29 @@ contract AccountManager is BaseAccount, Initializable {
         _requireFromEntryPoint();
 
         validationData = _validateSignature(userOp, userOpHash);
+
         addDepositToEntryPoint(missingAccountFunds);
+    }
+
+    function _validateCondition(bytes calldata callData) internal {
+        // decode params from calldata
+        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
+            .decode(callData[4:], (address, uint256, uint256, uint256));
+        // nonce + chainID check
+        if (nonce != 0) {
+            uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
+            require(nonce > previousNonce, "already executed transaction");
+        }
+        // set latest nonce
+        chainIdAndNonceByUser[to][chainId] = nonce;
+
+        // timestamp check
+        require(
+            block.timestamp > lastTransactionTimestampsByUser[to] + 10 minutes
+        );
+
+        // enough deposit check
+        require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
     function addDepositToEntryPoint(uint256 prefunds) public payable {
@@ -113,7 +114,7 @@ contract AccountManager is BaseAccount, Initializable {
         emit Deposited(msg.sender, msg.value);
     }
 
-    function withdraw(uint256 amount) external {
+    function withdraw(uint256 amount) external nonReentrant {
         require(
             depositBalances[msg.sender] >= amount,
             "withdraw amount exceeds deposit"
