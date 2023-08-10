@@ -63,6 +63,7 @@ export const IndexPage: FC<{}> = () => {
         parseEther('1'),
         parseEther('0.5'),
         1,
+        '0x32a490634ECc437Eb71d7667991E7C34E8fbFb68',
         process.env.NEXT_PUBLIC_PRIVATE_KEY ?? '',
       )
     } catch (e) {

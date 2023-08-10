@@ -44190,6 +44190,7 @@
         transaction,
         chainId
       }) => {
+        var _nonceRes$;
         console.log(transaction);
         const persistedData = await snap.request({
           method: 'snap_manageState',
@@ -44229,6 +44230,12 @@
           sender: MANAGER_CONTRACT_ADDRESS
         }).useMiddleware(signUserOperation);
         builder.setCallData(calldata);
+        const addressInNum = _ethers.BigNumber.from(persistedData.address);
+        const entrypointAbi = ['function getNonce(address sender, uint192 key)'];
+        const entrypoint = new _ethers.Contract(_userop.Constants.ERC4337.EntryPoint, entrypointAbi, destinationChainProvider);
+        const nonceRes = await entrypoint.callStatic.getNonce(MANAGER_CONTRACT_ADDRESS, addressInNum);
+        const entrypointNonce = addressInNum.shl(96).add(_ethers.BigNumber.from((_nonceRes$ = nonceRes[0]) !== null && _nonceRes$ !== void 0 ? _nonceRes$ : 0));
+        builder.setNonce(entrypointNonce);
         const userOp = await builder.buildOp(_userop.Constants.ERC4337.EntryPoint, chainIdNum);
         console.log(userOp);
         const chainData = await provider.getNetwork();

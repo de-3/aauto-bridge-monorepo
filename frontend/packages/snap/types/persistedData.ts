@@ -6,5 +6,6 @@ export type PersistedData = {
     latestExec: number
   }[]
   baseChainId: number
+  address: string
   privateKey: string
 }

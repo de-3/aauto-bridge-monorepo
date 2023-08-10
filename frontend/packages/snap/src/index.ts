@@ -173,7 +173,27 @@ export const onTransaction: OnTransactionHandler = async ({
   const builder = new UserOperationBuilder()
     .useDefaults({ sender: MANAGER_CONTRACT_ADDRESS })
     .useMiddleware(signUserOperation)
+
   builder.setCallData(calldata)
+
+  // Set nonce
+  // NOTE: nonce(256) = [address(160)][0 padding(32)][sequence(64)]
+  const addressInNum = BigNumber.from(persistedData.address)
+  const entrypointAbi = ['function getNonce(address sender, uint192 key)']
+  const entrypoint = new Contract(
+    Constants.ERC4337.EntryPoint,
+    entrypointAbi,
+    destinationChainProvider,
+  )
+  const nonceRes = await entrypoint.callStatic.getNonce(
+    MANAGER_CONTRACT_ADDRESS,
+    addressInNum,
+  )
+  const entrypointNonce = addressInNum
+    .shl(96)
+    .add(BigNumber.from(nonceRes[0] ?? 0))
+  builder.setNonce(entrypointNonce)
+
   const userOp = await builder.buildOp(Constants.ERC4337.EntryPoint, chainIdNum)
   console.log(userOp)
 
@@ -189,7 +209,7 @@ export const onTransaction: OnTransactionHandler = async ({
 
   return {
     content: panel([
-      heading('🎉 Done AAuto Bridge 🎉'),
+      heading('🎉 Bridge process started 🎉'),
       text(
         'Since the balance was not sufficient, an automatic bridge was performed. It takes about a minute to complete the bridge.',
       ),
