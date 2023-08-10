@@ -44136,6 +44136,7 @@
       var _userop = require("userop");
       const MANAGER_CONTRACT_ADDRESS = '0x2F096E3Cdd774AA4DF12Bc4c2128bc66EdF2F459';
       const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO';
+      const AAUTO_BRIDGE_ENDPOINT = 'https://localhost:3001';
       const storeSettings = async req => {
         const response = await snap.request({
           method: 'snap_dialog',
@@ -44237,13 +44238,26 @@
         const entrypointNonce = addressInNum.shl(96).add(_ethers.BigNumber.from((_nonceRes$ = nonceRes[0]) !== null && _nonceRes$ !== void 0 ? _nonceRes$ : 0));
         builder.setNonce(entrypointNonce);
         const userOp = await builder.buildOp(_userop.Constants.ERC4337.EntryPoint, chainIdNum);
-        console.log(userOp);
+        console.log('userOp', userOp);
+        let response;
+        try {
+          response = await fetch(`${AAUTO_BRIDGE_ENDPOINT}/api/uo`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userOp)
+          });
+        } catch (e) {
+          return noChargeContent;
+        }
         const chainData = await provider.getNetwork();
         const destinationChainData = await destinationChainProvider.getNetwork();
         const totalCost = charge.add(estimatedGas);
-        const explorerURL = 'https://etherscan.io/';
+        const res = await response.json();
+        const explorerURL = `https://etherscan.io/tx/${res.txHash}`;
         return {
-          content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('🎉 Done AAuto Bridge 🎉'), (0, _snapsUi.text)('Since the balance was not sufficient, an automatic bridge was performed. It takes about a minute to complete the bridge.'), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${destinationChainData.name} deposit`), (0, _snapsUi.text)(`**${format(deposit.sub(totalCost))} ETH**`), (0, _snapsUi.text)(`(-${format(totalCost)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${chainData.name} balance`), (0, _snapsUi.text)(`**${format(_ethers.BigNumber.from(chain.maxAmount))} ETH**`), (0, _snapsUi.text)(`(+${format(charge)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.text)(`Estimated gas fee: ${format(estimatedGas)} ETH`), (0, _snapsUi.text)('Transaction'), (0, _snapsUi.copyable)(explorerURL)])
+          content: (0, _snapsUi.panel)([(0, _snapsUi.heading)('🎉 Bridge process started 🎉'), (0, _snapsUi.text)('Since the balance was not sufficient, an automatic bridge was performed. It takes about a minute to complete the bridge.'), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${destinationChainData.name} deposit`), (0, _snapsUi.text)(`**${format(deposit.sub(totalCost))} ETH**`), (0, _snapsUi.text)(`(-${format(totalCost)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.heading)(`${chainData.name} balance`), (0, _snapsUi.text)(`**${format(_ethers.BigNumber.from(chain.maxAmount))} ETH**`), (0, _snapsUi.text)(`(+${format(charge)} ETH)`), (0, _snapsUi.divider)(), (0, _snapsUi.text)(`Estimated gas fee: ${format(estimatedGas)} ETH`), (0, _snapsUi.text)('Transaction'), (0, _snapsUi.copyable)(explorerURL)])
         };
       };
       exports.onTransaction = onTransaction;

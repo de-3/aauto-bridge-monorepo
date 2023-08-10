@@ -14,6 +14,7 @@ import {
 
 const MANAGER_CONTRACT_ADDRESS = '0x2F096E3Cdd774AA4DF12Bc4c2128bc66EdF2F459'
 const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO'
+const AAUTO_BRIDGE_ENDPOINT = 'https://localhost:3001'
 
 const storeSettings = async (req: StoreSettingsRequestParams) => {
   const response = await snap.request({
@@ -195,17 +196,30 @@ export const onTransaction: OnTransactionHandler = async ({
   builder.setNonce(entrypointNonce)
 
   const userOp = await builder.buildOp(Constants.ERC4337.EntryPoint, chainIdNum)
-  console.log(userOp)
+  console.log('userOp', userOp)
 
-  // TODO: Send userOp to server
+  let response: Response
+  // Send userOp to server
+  try {
+    response = await fetch(`${AAUTO_BRIDGE_ENDPOINT}/api/uo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userOp),
+    })
+  } catch (e) {
+    // TODO: fix
+    return noChargeContent
+  }
 
   const chainData = await provider.getNetwork()
   const destinationChainData = await destinationChainProvider.getNetwork()
 
   const totalCost = charge.add(estimatedGas)
 
-  // TODO: Fix url
-  const explorerURL = 'https://etherscan.io/'
+  const res: { txHash: string } = await response.json()
+  const explorerURL = `https://etherscan.io/tx/${res.txHash}`
 
   return {
     content: panel([
