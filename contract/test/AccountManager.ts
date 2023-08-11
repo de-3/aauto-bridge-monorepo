@@ -1,7 +1,6 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { UserOperationStruct } from "@account-abstraction/contracts";
 
 describe("AccountManager", function () {
   async function deployAccountManager() {
@@ -63,6 +62,10 @@ describe("AccountManager", function () {
       const { accountManager, userOp, entrypoint } = await loadFixture(
         deployAccountManager
       );
+
+      await accountManager
+        .connect(entrypoint)
+        .initialize("0x32a490634ECc437Eb71d7667991E7C34E8fbFb68");
 
       expect(
         await accountManager

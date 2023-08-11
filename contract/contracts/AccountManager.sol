@@ -12,14 +12,13 @@ import "./interfaces/IOptimismBridge.sol";
 contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     using ECDSA for bytes32;
 
-    bytes4 private constant VALID_SIG = 0x1626ba7e;
-    uint256 private constant SIG_VALIDATION_SUCCEDED = 0;
+    uint256 internal constant SIG_VALIDATION_SUCCEDED = 0;
 
     address immutable OPTIMISM_BRIDGE;
     IEntryPoint private immutable _entryPoint;
 
     mapping(address => uint256) public depositBalances;
-    mapping(address => address) userOpAddresses;
+    mapping(address => address) public userOpAddresses;
     mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
     mapping(address => uint) lastTransactionTimestampsByUser;
 
@@ -80,24 +79,30 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _requireFromEntryPoint();
 
         validationData = _validateSignature(userOp, userOpHash);
+
+        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
+            .decode(userOp.callData[4:], (address, uint256, uint256, uint256));
         // nonce key address check
-        uint160 key = uint160(userOp.nonce >> 64);
+        _validateNonceKeyAddress(userOp.nonce, to);
+
+        _validateCondition(to, chainId, nonce, charge);
+        _addDepositToEntryPoint(missingAccountFunds);
+    }
+
+    function _validateNonceKeyAddress(uint256 nonce, address to) internal view {
+        uint160 key = uint160(nonce >> 64);
         require(
-            key == uint160(userOpAddresses[userOp.sender]),
+            key == uint160(userOpAddresses[to]),
             "nonce key should be sender's userOpAddress"
         );
-
-        uint256 chargeAmount = _validateCondition(userOp.callData);
-        _addDepositToEntryPoint(missingAccountFunds + chargeAmount);
     }
 
     function _validateCondition(
-        bytes calldata callData
-    ) internal returns (uint256 chargeAmount) {
-        // decode params from calldata
-        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
-            .decode(callData[4:], (address, uint256, uint256, uint256));
-        chargeAmount = charge;
+        address to,
+        uint256 chainId,
+        uint256 nonce,
+        uint256 charge
+    ) internal {
         // nonce + chainID check
         if (nonce != 0) {
             uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
@@ -115,9 +120,9 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
-    function _addDepositToEntryPoint(uint256 amount) internal {
-        _entryPoint.depositTo{value: amount}(address(this));
-        emit AddedFundsToEntrypoint(amount);
+    function _addDepositToEntryPoint(uint256 _prefund) internal {
+        _entryPoint.depositTo{value: _prefund}(address(this));
+        emit AddedFundsToEntrypoint(_prefund);
     }
 
     function deposit() public payable {
