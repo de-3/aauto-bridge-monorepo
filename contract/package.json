@@ -4,7 +4,8 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
-    "clean": "rm -rf ./artifacts ./cache"
+    "clean": "rm -rf ./artifacts ./cache",
+    "migrate:goerli": "npx hardhat run --network goerli scripts/deploy.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
@@ -18,6 +19,7 @@
     "@types/mocha": ">=9.1.0",
     "@types/node": ">=16.0.0",
     "chai": "^4.2.0",
+    "dotenv": "^16.3.1",
     "ethers": "^6.4.0",
     "hardhat": "^2.17.1",
     "hardhat-gas-reporter": "^1.0.8",
