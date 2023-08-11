@@ -41,11 +41,12 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         UserOperation calldata userOp,
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
+        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
+            .decode(userOp.callData[4:], (address, uint256, uint256, uint256));
+
         bytes32 opHash = userOpHash.toEthSignedMessageHash();
         // check if L2 transaction sender is valid
-        if (
-            userOpAddresses[userOp.sender] != opHash.recover(userOp.signature)
-        ) {
+        if (userOpAddresses[to] != opHash.recover(userOp.signature)) {
             return SIG_VALIDATION_FAILED;
         }
         return SIG_VALIDATION_SUCCEDED;

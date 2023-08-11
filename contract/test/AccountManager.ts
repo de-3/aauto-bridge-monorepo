@@ -78,4 +78,10 @@ describe("AccountManager", function () {
       ).to.emit(accountManager, "AddedFundsToEntrypoint");
     });
   });
+
+  describe("withdraw", function () {
+    it("withdraw successfully", async function () {
+      
+    });
+  });
 });
