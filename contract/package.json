@@ -5,7 +5,7 @@
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
     "clean": "rm -rf ./artifacts ./cache",
-    "migrate:goerli": "npx hardhat run --network goerli scripts/deploy.js"
+    "migrate:goerli": "npx hardhat run --network goerli scripts/deploy.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

@@ -90,7 +90,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _addDepositToEntryPoint(missingAccountFunds);
     }
 
-    function _validateCondition(bytes calldata callData) internal returns () {
+    function _validateCondition(bytes calldata callData) internal {
         // decode params from calldata
         (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
             .decode(callData[4:], (address, uint256, uint256, uint256));
