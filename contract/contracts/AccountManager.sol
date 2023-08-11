@@ -13,6 +13,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     using ECDSA for bytes32;
 
     bytes4 private constant VALID_SIG = 0x1626ba7e;
+    uint256 internal constant SIG_VALIDATION_SUCCEDED = 0;
 
     address immutable OPTIMISM_BRIDGE;
     IEntryPoint private immutable _entryPoint;
@@ -48,7 +49,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         ) {
             return SIG_VALIDATION_FAILED;
         }
-        return 0;
+        return SIG_VALIDATION_SUCCEDED;
     }
 
     function execute(
@@ -79,7 +80,6 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _requireFromEntryPoint();
 
         validationData = _validateSignature(userOp, userOpHash);
-        require(validationData == 0, "_validateSignature failed");
         // nonce key address check
         uint160 key = uint160(userOp.nonce >> 64);
         require(
