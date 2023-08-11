@@ -13,6 +13,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     using ECDSA for bytes32;
 
     bytes4 private constant VALID_SIG = 0x1626ba7e;
+    uint256 private constant SIG_VALIDATION_SUCCEDED = 0;
 
     address immutable OPTIMISM_BRIDGE;
     IEntryPoint private immutable _entryPoint;
@@ -48,7 +49,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         ) {
             return SIG_VALIDATION_FAILED;
         }
-        return 0;
+        return SIG_VALIDATION_SUCCEDED;
     }
 
     function execute(
@@ -81,16 +82,22 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         validationData = _validateSignature(userOp, userOpHash);
         // nonce key address check
         uint160 key = uint160(userOp.nonce >> 64);
-        require(key == uint160(userOpAddresses[userOp.sender]));
+        require(
+            key == uint160(userOpAddresses[userOp.sender]),
+            "nonce key should be sender's userOpAddress"
+        );
 
-        _validateCondition(userOp.callData);
-        addDepositToEntryPoint(missingAccountFunds);
+        uint256 chargeAmount = _validateCondition(userOp.callData);
+        _addDepositToEntryPoint(missingAccountFunds + chargeAmount);
     }
 
-    function _validateCondition(bytes calldata callData) internal {
+    function _validateCondition(
+        bytes calldata callData
+    ) internal returns (uint256 chargeAmount) {
         // decode params from calldata
         (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
             .decode(callData[4:], (address, uint256, uint256, uint256));
+        chargeAmount = charge;
         // nonce + chainID check
         if (nonce != 0) {
             uint256 previousNonce = chainIdAndNonceByUser[to][chainId];
@@ -108,9 +115,9 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         require(depositBalances[to] >= charge, "not enough deposit to bridge");
     }
 
-    function addDepositToEntryPoint(uint256 prefunds) public payable {
-        _entryPoint.depositTo{value: msg.value + prefunds}(address(this));
-        emit AddedFundsToEntrypoint(msg.value + prefunds);
+    function _addDepositToEntryPoint(uint256 amount) internal {
+        _entryPoint.depositTo{value: amount}(address(this));
+        emit AddedFundsToEntrypoint(amount);
     }
 
     function deposit() public payable {
