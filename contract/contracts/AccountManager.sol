@@ -17,7 +17,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     address immutable OPTIMISM_BRIDGE;
     IEntryPoint private immutable _entryPoint;
 
-    mapping(address => uint256) depositBalances;
+    mapping(address => uint256) public depositBalances;
     mapping(address => address) userOpAddresses;
     mapping(address => mapping(uint256 => uint256)) chainIdAndNonceByUser;
     mapping(address => uint) lastTransactionTimestampsByUser;
