@@ -60,7 +60,16 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     ) external {
         _requireFromEntryPoint();
 
+        _validateTransactionTimestamp(to);
         _bridgeToOptimism(to, charge);
+
+        lastTransactionTimestampsByUser[to] = block.timestamp;
+    }
+
+    function _validateTransactionTimestamp(address to) internal view {
+        require(
+            block.timestamp > lastTransactionTimestampsByUser[to] + 10 minutes
+        );
     }
 
     function _bridgeToOptimism(address to, uint256 amount) internal {
@@ -111,11 +120,6 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         }
         // set latest nonce
         chainIdAndNonceByUser[to][chainId] = nonce;
-
-        // timestamp check
-        require(
-            block.timestamp > lastTransactionTimestampsByUser[to] + 10 minutes
-        );
 
         // enough deposit check
         require(depositBalances[to] >= charge, "not enough deposit to bridge");
