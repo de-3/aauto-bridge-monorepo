@@ -41,8 +41,16 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         UserOperation calldata userOp,
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
-        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
-            .decode(userOp.callData[4:], (address, uint256, uint256, uint256));
+        (
+            address to,
+            uint256 chainId,
+            uint256 nonce,
+            uint256 charge,
+            uint256 callGasLimit
+        ) = abi.decode(
+                userOp.callData[4:],
+                (address, uint256, uint256, uint256, uint256)
+            );
 
         bytes32 opHash = userOpHash.toEthSignedMessageHash();
         // check if L2 transaction sender is valid
@@ -56,7 +64,8 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         address to,
         uint256 chainId,
         uint256 nonce,
-        uint256 charge
+        uint256 charge,
+        uint256 callGasLimit
     ) external {
         _requireFromEntryPoint();
 
@@ -64,6 +73,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _bridgeToOptimism(to, charge);
 
         lastTransactionTimestampsByUser[to] = block.timestamp;
+        depositBalances[to] -= charge + (callGasLimit - gasleft());
     }
 
     function _validateTransactionTimestamp(address to) internal view {
@@ -78,6 +88,7 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
             20000,
             bytes("")
         );
+
         emit BridgeExecuted(to, amount);
     }
 
@@ -90,8 +101,16 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
 
         validationData = _validateSignature(userOp, userOpHash);
 
-        (address to, uint256 chainId, uint256 nonce, uint256 charge) = abi
-            .decode(userOp.callData[4:], (address, uint256, uint256, uint256));
+        (
+            address to,
+            uint256 chainId,
+            uint256 nonce,
+            uint256 charge,
+            uint256 callGasLimit
+        ) = abi.decode(
+                userOp.callData[4:],
+                (address, uint256, uint256, uint256, uint256)
+            );
         // nonce key address check
         _validateNonceKeyAddress(userOp.nonce, to);
 
