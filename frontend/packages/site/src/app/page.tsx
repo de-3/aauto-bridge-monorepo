@@ -1,9 +1,9 @@
-import ClientSideComponent from "./home.client";
+import { IndexPage } from '@/components/pages/Index'
 
 export default function Home() {
   return (
-    <div>
-      <ClientSideComponent />
-    </div>
-  );
+    <main>
+      <IndexPage />
+    </main>
+  )
 }
