@@ -5,7 +5,7 @@ async function main() {
   // add entrypoint
   const manager = await managerContract.deploy(
     "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
-    "0x636Af16bf2f682dD3109e60102b8E1A089FedAa8"
+    "0x022Fc3EBAA3d53F8f9b270CC4ABe1B0e4A406253"
   );
 
   await manager.waitForDeployment();

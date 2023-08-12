@@ -73,10 +73,10 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     }
 
     function _bridgeToOptimism(address to, uint256 amount) internal {
-        IOptimismBridge(OPTIMISM_BRIDGE).bridgeETHTo{value: amount}(
+        IOptimismBridge(payable(OPTIMISM_BRIDGE)).bridgeETHTo{value: amount}(
             to,
-            0,
-            "0x"
+            20000,
+            bytes("")
         );
         emit BridgeExecuted(to, amount);
     }
