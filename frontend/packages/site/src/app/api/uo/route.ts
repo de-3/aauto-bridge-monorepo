@@ -1,10 +1,8 @@
 import {
   Client,
-  IClientOpts,
   ISendUserOperationOpts,
   IUserOperation,
   UserOperationBuilder,
-  Constants,
 } from 'userop'
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -23,15 +21,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const entrypoint: IClientOpts = {
-    entryPoint: Constants.ERC4337.EntryPoint,
-    overrideBundlerRpc: process.env.STACKUP_RPC_URL,
-  }
-
-  const client = await Client.init(
-    process.env.STACKUP_RPC_URL as string,
-    entrypoint,
-  )
+  const client = await Client.init(process.env.STACKUP_RPC_URL as string)
 
   if (req.body == null) {
     return new NextResponse('', { status: 400, headers: corsHeaders })
@@ -39,8 +29,8 @@ export async function POST(req: NextRequest) {
 
   const reqBody: IUserOperation = await req.json()
   const opts: ISendUserOperationOpts = {
-    dryRun: true,
-    onBuild: (op) => console.log('Signed UserOperation:', op),
+    // dryRun: true,
+    // onBuild: (op) => console.log('Signed UserOperation:', op),
   }
 
   const builder = new UserOperationBuilder().useDefaults(reqBody)
@@ -63,6 +53,9 @@ export async function POST(req: NextRequest) {
       },
     )
   } catch (e) {
-    return new NextResponse('', { status: 403, headers: corsHeaders })
+    return new NextResponse(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: corsHeaders,
+    })
   }
 }

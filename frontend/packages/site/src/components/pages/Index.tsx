@@ -60,9 +60,9 @@ export const IndexPage: FC<{}> = () => {
     try {
       await storeSettings(
         420,
-        parseEther('1'),
-        parseEther('0.5'),
-        1,
+        parseEther('0.8'),
+        parseEther('0.7'),
+        5,
         '0x32a490634ECc437Eb71d7667991E7C34E8fbFb68',
         process.env.NEXT_PUBLIC_PRIVATE_KEY ?? '',
       )
