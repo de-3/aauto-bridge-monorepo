@@ -28,8 +28,7 @@ const config: HardhatUserConfig = {
   },
   abiExporter: [
     {
-      path: "./abi/pretty",
-      pretty: true,
+      path: "./abi",
     },
   ],
 };
