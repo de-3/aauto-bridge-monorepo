@@ -37,6 +37,14 @@ const storeSettings = async (req: StoreSettingsRequestParams) => {
   })
 }
 
+const retrieveSettings = async () => {
+  const persistedData = (await snap.request({
+    method: 'snap_manageState',
+    params: { operation: 'get' },
+  })) as PersistedData | null
+  return persistedData
+}
+
 const calcCharge = (
   maxAmount: BigNumber,
   minAmount: BigNumber,
@@ -60,6 +68,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'storeSettings':
       await storeSettings(requestParams)
       break
+    case 'retrieveSettings':
+      return await retrieveSettings()
     default:
       throw new Error('Method not found.')
   }

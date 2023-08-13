@@ -3,7 +3,7 @@ export type PersistedData = {
     chainId: number
     maxAmount: string
     minAmount: string
-    latestTx: {
+    latestTx?: {
       timestamp: number
       hash: string
       nonce: number

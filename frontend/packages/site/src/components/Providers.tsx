@@ -6,7 +6,7 @@ import { theme } from '../app/style'
 
 import { useEffect, useState } from 'react'
 import { WagmiConfig, configureChains, createConfig } from 'wagmi'
-import { polygonMumbai, optimismGoerli } from 'wagmi/chains'
+import { optimismGoerli, goerli, baseGoerli, zoraTestnet } from 'wagmi/chains'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
 import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
@@ -17,7 +17,7 @@ import {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { chains, publicClient } = configureChains(
-    [polygonMumbai, optimismGoerli],
+    [goerli, optimismGoerli, baseGoerli, zoraTestnet],
     [
       alchemyProvider({
         apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ?? '',
@@ -26,7 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     ],
   )
 
-  const projectId = 'Autonomous World ID'
+  const projectId = 'AAuto Bridge'
 
   const connectors = connectorsForWallets([
     {

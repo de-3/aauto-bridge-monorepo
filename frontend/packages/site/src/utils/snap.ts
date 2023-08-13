@@ -1,5 +1,6 @@
 import { defaultSnapOrigin } from '@/config/snap'
 import { GetSnapsResponse, Snap } from '@/types/snap'
+import { PersistedData as SnapPersistedData } from '../../../snap/types/persistedData'
 
 /**
  * Get the installed snaps in MetaMask.
@@ -51,14 +52,26 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   }
 }
 
-export const storeSettings = async (
-  chainId: number,
-  maxAmount: BigInt,
-  minAmount: BigInt,
-  baseChainId: number,
-  address: string,
-  privateKey: string,
-) => {
+export const retrieveSettings = async (): Promise<PersistedData> => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'retrieveSettings',
+      },
+    },
+  })
+}
+
+export type PersistedData = SnapPersistedData
+
+export const storeSettings = async ({
+  chains,
+  baseChainId,
+  address,
+  privateKey,
+}: PersistedData) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
@@ -66,13 +79,7 @@ export const storeSettings = async (
       request: {
         method: 'storeSettings',
         params: {
-          chains: [
-            {
-              chainId,
-              maxAmount: maxAmount.toString(),
-              minAmount: minAmount.toString(),
-            },
-          ],
+          chains,
           baseChainId,
           address,
           privateKey,
