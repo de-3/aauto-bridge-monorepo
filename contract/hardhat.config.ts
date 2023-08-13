@@ -5,7 +5,7 @@ import "@nomicfoundation/hardhat-toolbox";
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "goerli",
+  defaultNetwork: "hardhat",
   networks: {
     hardhat: {
       chainId: 1337,
