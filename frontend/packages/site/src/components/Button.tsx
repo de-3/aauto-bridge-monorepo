@@ -16,7 +16,7 @@ export const ConnectButton = (props: ComponentProps<typeof Button>) => {
   return (
     <Button {...props}>
       <Image src="/images/flask_fox.svg" alt="Flask" />
-      <Text>Connect</Text>
+      <Text>Install</Text>
     </Button>
   )
 }
@@ -25,7 +25,7 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
   return (
     <Button {...props}>
       <Image src="/images/flask_fox.svg" alt="Flask" />
-      <Text>Reconnect</Text>
+      <Text>Reinstall</Text>
     </Button>
   )
 }
@@ -36,6 +36,10 @@ export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
 
 export const StoreSettingsButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Store settings</Button>
+}
+
+export const DepositButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Deposit</Button>
 }
 
 export const HeaderButtons = ({

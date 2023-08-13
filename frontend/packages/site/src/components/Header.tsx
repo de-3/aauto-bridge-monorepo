@@ -6,8 +6,8 @@ import { FC } from 'react'
 
 export const Header: FC<{}> = () => {
   return (
-    <Container>
-      <HStack w="full" justify="space-between">
+    <Container maxW="container.xl">
+      <HStack w="full" justify="space-between" my={8}>
         <Text>AAuto Bridge</Text>
         <HStack>
           <ConnectButton />
