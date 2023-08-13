@@ -55,16 +55,16 @@ export const IndexPage: FC<{}> = () => {
         return
       }
       const isFlask = // @ts-ignore
-      (await provider.request({ method: 'web3_clientVersion' }))?.includes(
-        'flask',
-      )
+        (await provider.request({ method: 'web3_clientVersion' }))?.includes(
+          'flask',
+        )
 
       setMetamaskState({
         ...metamaskState,
         isFlask,
       })
     })()
-  }, [])
+  }, [metamaskState])
 
   const [userOpAddress, setUserOpAddress] = useState<`0x${string}`>()
   const [selectedNetwork, setSelectedNetwork] = useState<number>()
