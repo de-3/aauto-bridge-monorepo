@@ -20,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     [goerli, optimismGoerli, baseGoerli, zoraTestnet],
     [
       alchemyProvider({
-        apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ?? '',
+        apiKey: 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO',
       }),
       publicProvider(),
     ],
