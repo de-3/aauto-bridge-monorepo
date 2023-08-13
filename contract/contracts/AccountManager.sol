@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 
 import "./interfaces/IOptimismBridge.sol";
+import "./interfaces/IBaseBridge.sol";
+import "./interfaces/IZoraBridge.sol";
 
 contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     using ECDSA for bytes32;
@@ -15,6 +17,8 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     uint256 internal constant SIG_VALIDATION_SUCCEDED = 0;
 
     address immutable OPTIMISM_BRIDGE;
+    address immutable BASE_BRIDGE;
+    address immutable ZORA_BRIDGE;
     IEntryPoint private immutable _entryPoint;
 
     mapping(address => uint256) public depositBalances;
@@ -27,9 +31,17 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
     event Withdrawn(address to, uint256 amount);
     event AddedFundsToEntrypoint(uint256 amount);
 
-    constructor(IEntryPoint anEntryPoint, address optimismBridge) {
+    constructor(
+        IEntryPoint anEntryPoint,
+        address optimismBridge,
+        address baseBridge,
+        address zoraBridge
+    ) {
         _entryPoint = anEntryPoint;
         OPTIMISM_BRIDGE = optimismBridge;
+        BASE_BRIDGE = baseBridge;
+        ZORA_BRIDGE = zoraBridge;
+
         _disableInitializers();
     }
 
@@ -70,7 +82,16 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         _requireFromEntryPoint();
 
         _validateTransactionTimestamp(to);
-        _bridgeToOptimism(to, charge);
+
+        if (chainId == 420) {
+            _bridgeToOptimism(to, charge);
+        }
+        if (chainId == 84531) {
+            _bridgeToBase(to, charge);
+        }
+        if (chainId == 999) {
+            _bridgeToZora(to, charge);
+        }
 
         lastTransactionTimestampsByUser[to] = block.timestamp;
         depositBalances[to] -= charge + (callGasLimit - gasleft());
@@ -86,6 +107,28 @@ contract AccountManager is BaseAccount, Initializable, ReentrancyGuard {
         IOptimismBridge(payable(OPTIMISM_BRIDGE)).bridgeETHTo{value: amount}(
             to,
             20000,
+            bytes("")
+        );
+
+        emit BridgeExecuted(to, amount);
+    }
+
+    function _bridgeToBase(address to, uint256 amount) internal {
+        IBaseBridge(payable(BASE_BRIDGE)).bridgeETHTo{value: amount}(
+            to,
+            20000,
+            bytes("")
+        );
+
+        emit BridgeExecuted(to, amount);
+    }
+
+    function _bridgeToZora(address to, uint256 amount) internal {
+        IZoraBridge(payable(ZORA_BRIDGE)).depositTransaction{value: amount}(
+            to,
+            amount,
+            100000,
+            false,
             bytes("")
         );
 
