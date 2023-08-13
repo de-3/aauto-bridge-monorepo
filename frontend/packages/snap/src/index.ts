@@ -13,10 +13,9 @@ import {
   IUserOperation,
 } from 'userop'
 
-const MANAGER_CONTRACT_ADDRESS = '0x93c999F21a62E7C4726540c3F3708A26c58BAc35'
+const MANAGER_CONTRACT_ADDRESS = '0x65f46d46f0F632FA966A652748F0F6C4b9716411'
 const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO'
-const AAUTO_BRIDGE_ENDPOINT =
-  'https://aauto-bridge-monorepo-fktgvpx5b-de3.vercel.app'
+const AAUTO_BRIDGE_ENDPOINT = 'https://localhost:3001'
 const ANTI_DUPLICATION_INTERVAL_MINUTES = 10
 
 const storeSettings = async (req: StoreSettingsRequestParams) => {

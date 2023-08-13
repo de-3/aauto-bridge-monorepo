@@ -211,6 +211,12 @@ export const IndexPage: FC<{}> = () => {
     value: parseEther(depositEth?.toString() ?? '0'),
   })
 
+  const { write: withdraw } = useContractWrite({
+    address: contractAddress,
+    abi: accountManagerABI,
+    functionName: 'withdraw',
+  })
+
   const { address } = useAccount()
   const { data: depositedBalance } = useContractRead({
     address: !!address ? contractAddress : undefined,
@@ -240,6 +246,15 @@ export const IndexPage: FC<{}> = () => {
         args: [userOpAddress],
       })
     }
+  }
+
+  const handleWithdraw = async () => {
+    if (!depositedBalance) {
+      throw new Error('no deposit')
+    }
+    withdraw({
+      args: [depositedBalance],
+    })
   }
 
   const handleChangeMax = (valueAsString: string, valueAsNumber: number) => {
@@ -439,14 +454,19 @@ export const IndexPage: FC<{}> = () => {
                 )}
               </HStack>
 
-              <Button
-                onClick={handleDeposit}
-                isDisabled={!userOpAddress || !depositEth}
-              >
-                {!!storedUserOpAddress && storedUserOpAddress != zero
-                  ? 'Deposit'
-                  : 'Initialize'}
-              </Button>
+              <HStack>
+                <Button
+                  onClick={handleDeposit}
+                  isDisabled={!userOpAddress || !depositEth}
+                >
+                  {!!storedUserOpAddress && storedUserOpAddress != zero
+                    ? 'Deposit'
+                    : 'Initialize'}
+                </Button>
+                <Button onClick={handleWithdraw} isDisabled={!depositedBalance}>
+                  Withdraw All
+                </Button>
+              </HStack>
             </VStack>
           </CardBody>
         </Card>
