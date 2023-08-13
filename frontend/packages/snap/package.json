@@ -1,13 +1,13 @@
 {
-  "name": "aauto-bridge-snap",
+  "name": "aauto-bridge-metamask-snap",
   "version": "0.1.0",
-  "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "private": false,
+  "description": "AccountAbstracted-Auto-Bridge MetaMask snap, enabling automated ETH bridge to L2 networks",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/de3-masterhack/aauto-bridge-monorepo.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
+  "license": "UNLICENSED",
   "main": "src/index.ts",
   "files": [
     "dist/",
