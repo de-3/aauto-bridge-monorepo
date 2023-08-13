@@ -1,4 +1,3 @@
-import '@/app/globals.css'
 import { Header } from '@/components/Header'
 import { Providers } from '@/components/Providers'
 import type { Metadata } from 'next'
