@@ -108,23 +108,6 @@ export const IndexPage: FC<{}> = () => {
     }
   }
 
-  const { sendTransaction } = useSendTransaction({
-    to: '0x5305f701cc749Acf1146E6DE47E10D094C20dbe9',
-    value: BigInt(0),
-  })
-
-  const handleSendHelloClick = async () => {
-    try {
-      await sendTransaction()
-    } catch (e) {
-      console.error(e)
-      setMetamaskState({
-        ...metamaskState,
-        error: e as Error,
-      })
-    }
-  }
-
   useEffect(() => {
     if (!!persistedData?.chains) {
       const chainIndex = persistedData.chains.findIndex(
@@ -279,6 +262,23 @@ export const IndexPage: FC<{}> = () => {
     setDepositEth(valueAsNumber)
   }
 
+  const { sendTransaction } = useSendTransaction({
+    to: address ?? '0x',
+    value: BigInt(0),
+  })
+
+  const handleSendHelloClick = async () => {
+    try {
+      await sendTransaction()
+    } catch (e) {
+      console.error(e)
+      setMetamaskState({
+        ...metamaskState,
+        error: e as Error,
+      })
+    }
+  }
+
   return (
     <Container>
       <VStack spacing={6}>
@@ -286,48 +286,56 @@ export const IndexPage: FC<{}> = () => {
         {metamaskState.error && (
           <Card w="full">
             <CardBody>
-              <Text color="red.500">
-                <b>An error happened:</b> {metamaskState.error.message}
-              </Text>
+              <VStack alignItems="start">
+                <Text color="red.500">
+                  <b>An error happened:</b> {metamaskState.error.message}
+                </Text>
+              </VStack>
             </CardBody>
           </Card>
         )}
         {!metamaskState.isFlask && (
           <Card w="full">
             <CardBody>
-              <Text>
-                Snaps is pre-release software only available in MetaMask Flask,
-                a canary distribution for developers with access to upcoming
-                features.
-              </Text>
-              <InstallFlaskButton />
+              <VStack alignItems="start">
+                <Text>
+                  Snaps is pre-release software only available in MetaMask
+                  Flask, a canary distribution for developers with access to
+                  upcoming features.
+                </Text>
+                <InstallFlaskButton />
+              </VStack>
             </CardBody>
           </Card>
         )}
         {!metamaskState.installedSnap && (
           <Card w="full">
             <CardBody>
-              <Text>
-                Get started by connecting to and installing the example snap.
-              </Text>
-              <ConnectButton
-                onClick={handleConnectClick}
-                isDisabled={!metamaskState.isFlask}
-              />
+              <VStack alignItems="start">
+                <Text>
+                  Get started by connecting to and installing the snap.
+                </Text>
+                <ConnectButton
+                  onClick={handleConnectClick}
+                  isDisabled={!metamaskState.isFlask}
+                />
+              </VStack>
             </CardBody>
           </Card>
         )}
         {shouldDisplayReconnectButton(metamaskState.installedSnap) && (
           <Card w="full">
             <CardBody>
-              <Text>
-                While connected to a local running snap this button will always
-                be displayed in order to update the snap if a change is made.
-              </Text>
-              <ReconnectButton
-                onClick={handleConnectClick}
-                isDisabled={!metamaskState.installedSnap}
-              />
+              <VStack alignItems="start">
+                <Text>
+                  While connected to the snap this button will always be
+                  displayed in order to update the snap if a change is made.
+                </Text>
+                <ReconnectButton
+                  onClick={handleConnectClick}
+                  isDisabled={!metamaskState.installedSnap}
+                />
+              </VStack>
             </CardBody>
           </Card>
         )}
@@ -336,8 +344,9 @@ export const IndexPage: FC<{}> = () => {
           <CardBody>
             <VStack>
               <Text>
-                Display a custom message within a confirmation screen in
-                MetaMask.
+                Configure the L2 settings for the bridge destination, which will
+                be automatically bridged to keep the Wallet balance between the
+                Max and Min values.
               </Text>
 
               <Select
@@ -398,8 +407,8 @@ export const IndexPage: FC<{}> = () => {
           <CardBody>
             <VStack w="full" alignItems="start">
               <Text>
-                Display a custom message within a confirmation screen in
-                MetaMask.
+                The funds to be bridged are deposited in the contract on L1. The
+                deposited funds can be withdrawn at any time.
               </Text>
 
               <InputGroup w="full">
@@ -438,7 +447,8 @@ export const IndexPage: FC<{}> = () => {
         <Card w="full">
           <CardBody>
             <Text>
-              Display a custom message within a confirmation screen in MetaMask.
+              Let&apos;s switch to the L2 chain that has been configured and
+              execute a test transaction
             </Text>
             <SendHelloButton
               onClick={handleSendHelloClick}

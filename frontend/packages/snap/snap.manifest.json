@@ -7,11 +7,11 @@
     "url": "https://github.com/de3-masterhack/aauto-bridge-monorepo.git"
   },
   "source": {
-    "shasum": "G9HZl1mssVWxfSw2sew8dSwCAU76DbA1Qtvj1eiCH1g=",
+    "shasum": "yyI5FhgbfZC0tAONozJ+Zuv2wQvIKcyTnG0iibpEcsc=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
-        "iconPath": "images/icon.png",
+        "iconPath": "images/icon.svg",
         "packageName": "aauto-bridge-metamask-snap",
         "registry": "https://registry.npmjs.org/"
       }
