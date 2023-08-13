@@ -49,6 +49,7 @@ export const IndexPage: FC<{}> = () => {
   })
 
   useEffect(() => {
+    console.log('test')
     ;(async () => {
       const provider = await detectEthereumProvider()
       if (provider == null) {
@@ -64,7 +65,7 @@ export const IndexPage: FC<{}> = () => {
         isFlask,
       })
     })()
-  }, [metamaskState])
+  }, [])
 
   const [userOpAddress, setUserOpAddress] = useState<`0x${string}`>()
   const [selectedNetwork, setSelectedNetwork] = useState<number>()
@@ -109,6 +110,7 @@ export const IndexPage: FC<{}> = () => {
   }
 
   useEffect(() => {
+    console.log('test2')
     if (!!persistedData?.chains) {
       const chainIndex = persistedData.chains.findIndex(
         (c) => c.chainId == selectedNetwork,
@@ -224,12 +226,14 @@ export const IndexPage: FC<{}> = () => {
     args: [address ?? '0x'],
   })
 
+  const zero = '0x0000000000000000000000000000000000000000'
+
   const handleDeposit = async () => {
     if (!userOpAddress) {
       throw new Error('not set userOpAddress')
     }
 
-    if (!!storedUserOpAddress) {
+    if (!!storedUserOpAddress && storedUserOpAddress != zero) {
       await deposit()
     } else {
       await initialize({
@@ -427,10 +431,11 @@ export const IndexPage: FC<{}> = () => {
                 )}
 
                 {!!userOpAddress && (
-                  <Text fontSize="xs">{`UserOp address: ${userOpAddress.slice(
-                    0,
-                    6,
-                  )}...${userOpAddress.slice(-4)}`}</Text>
+                  <Text fontSize="xs">{`UserOp address: ${
+                    !!storedUserOpAddress && storedUserOpAddress != zero
+                      ? storedUserOpAddress.slice(0, 6)
+                      : userOpAddress.slice(0, 6)
+                  }`}</Text>
                 )}
               </HStack>
 
@@ -438,7 +443,9 @@ export const IndexPage: FC<{}> = () => {
                 onClick={handleDeposit}
                 isDisabled={!userOpAddress || !depositEth}
               >
-                {!!storedUserOpAddress ? 'Deposit' : 'Initialize'}
+                {!!storedUserOpAddress && storedUserOpAddress != zero
+                  ? 'Deposit'
+                  : 'Initialize'}
               </Button>
             </VStack>
           </CardBody>
