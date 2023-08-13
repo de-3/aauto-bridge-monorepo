@@ -7,11 +7,11 @@
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "j0HrXxQPxVO67yVQKa29uwXjDfZQO3YM3/nPsF4r2EY=",
+    "shasum": "IjHUCDC3T6AHANdS+WjlifyPO6sLDneVCVVvSKElt/g=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
-        "iconPath": "images/icon.svg",
+        "iconPath": "images/icon.png",
         "packageName": "aauto-bridge-snap",
         "registry": "https://registry.npmjs.org/"
       }
