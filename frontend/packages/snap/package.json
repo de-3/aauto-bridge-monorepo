@@ -1,6 +1,6 @@
 {
   "name": "aauto-bridge-metamask-snap",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "private": false,
   "description": "AccountAbstracted-Auto-Bridge MetaMask snap, enabling automated ETH bridge to L2 networks",
   "repository": {

@@ -1,18 +1,18 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "An example Snap written in TypeScript.",
   "proposedName": "AAuto Bridge",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/de3-masterhack/aauto-bridge-monorepo.git"
   },
   "source": {
-    "shasum": "uxNJ+F9qIoAOowx8dyI0fyo+w3X3umjIRTgLNeApIAU=",
+    "shasum": "G9HZl1mssVWxfSw2sew8dSwCAU76DbA1Qtvj1eiCH1g=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.png",
-        "packageName": "aauto-bridge-snap",
+        "packageName": "aauto-bridge-metamask-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
