@@ -24,6 +24,7 @@ module.exports = {
         'import/no-unassigned-import': 'off',
         '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/no-shadow': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
       },
     },
 
