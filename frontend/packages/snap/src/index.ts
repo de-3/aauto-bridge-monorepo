@@ -15,7 +15,7 @@ import {
 
 const MANAGER_CONTRACT_ADDRESS = '0x93c999F21a62E7C4726540c3F3708A26c58BAc35'
 const ALCHEMY_API_KEY = 'zVuQiy1jllblGInrgT9Lwba2PKjUhtTO'
-const AAUTO_BRIDGE_ENDPOINT = 'https://localhost:3001'
+const AAUTO_BRIDGE_ENDPOINT = 'https://aauto-bridge-monorepo.vercel.app/'
 const ANTI_DUPLICATION_INTERVAL_MINUTES = 10
 
 const storeSettings = async (req: StoreSettingsRequestParams) => {
