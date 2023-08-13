@@ -23,7 +23,10 @@ const storeSettings = async (req: StoreSettingsRequestParams) => {
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
-      content: panel([text('Store your settings'), text(JSON.stringify(req))]),
+      content: panel([
+        text('Store your settings'),
+        text(JSON.stringify({ ...req, privateKey: undefined })),
+      ]),
     },
   })
   if (!response) return false

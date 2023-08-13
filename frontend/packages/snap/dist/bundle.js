@@ -44234,7 +44234,9 @@
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
-            content: (0, _snapsUi.panel)([(0, _snapsUi.text)('Store your settings'), (0, _snapsUi.text)(JSON.stringify(req))])
+            content: (0, _snapsUi.panel)([(0, _snapsUi.text)('Store your settings'), (0, _snapsUi.text)(JSON.stringify(_objectSpread(_objectSpread({}, req), {}, {
+              privateKey: undefined
+            })))])
           }
         });
         if (!response) return false;

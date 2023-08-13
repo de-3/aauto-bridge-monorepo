@@ -1,5 +1,5 @@
 {
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "An example Snap written in TypeScript.",
   "proposedName": "AAuto Bridge",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/de3-masterhack/aauto-bridge-monorepo.git"
   },
   "source": {
-    "shasum": "HYpnWfCaVx6oZyj6jj5N63nY/9v6NNluJuzDCH52RYw=",
+    "shasum": "Xub/7+rRsLN9xT6KsUcTsobOAE5HUfCthJJo8oO57F0=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
