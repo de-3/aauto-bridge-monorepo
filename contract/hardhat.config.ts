@@ -6,7 +6,7 @@ import "hardhat-abi-exporter";
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "goerli",
+  defaultNetwork: "hardhat",
   networks: {
     hardhat: {
       chainId: 1337,
